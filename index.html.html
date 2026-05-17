@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Simple Audio Recorder & Share</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: #0f172a;
+            padding: 1.5rem 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .recorder-area {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .recorder-area.recording {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-family: monospace;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1rem;
+        }
+
+        .status {
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .recordings-list {
+            margin-top: 2rem;
+        }
+
+        .recordings-list h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recording-item {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .audio-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .audio-info audio {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .audio-meta {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .share-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 3rem;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .content {
+                padding: 1.5rem;
+            }
+            .recorder-area {
+                padding: 1.5rem;
+            }
+            .timer {
+                font-size: 2rem;
+            }
+            .recording-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .share-buttons {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎙️ Simple Audio Recorder</h1>
+        <p>Enregistrez votre voix et partagez instantanément</p>
+    </div>
+    <div class="content">
+        <!-- Zone d'enregistrement -->
+        <div class="recorder-area" id="recorderArea">
+            <div class="timer" id="timer">00:00</div>
+            <div class="status" id="status">Prêt à enregistrer</div>
+            <div class="button-group">
+                <button class="btn btn-primary" id="recordBtn">🎤 Enregistrer</button>
+                <button class="btn btn-danger" id="stopBtn" disabled>⏹️ Arrêter</button>
+            </div>
+        </div>
+
+        <!-- Liste des enregistrements -->
+        <div class="recordings-list" id="recordingsList">
+            <h3>📀 Mes enregistrements</h3>
+            <div id="recordingsContainer">
+                <div style="text-align: center; color: #94a3b8; padding: 2rem;">
+                    Aucun enregistrement pour le moment
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+    // ==================== CONFIGURATION ====================
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let startTime = null;
+    let timerInterval = null;
+    let stream = null;
+
+    // Éléments DOM
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const timerEl = document.getElementById('timer');
+    const statusEl = document.getElementById('status');
+    const recorderArea = document.getElementById('recorderArea');
+    const recordingsContainer = document.getElementById('recordingsContainer');
+    const toastEl = document.getElementById('toast');
+
+    // ==================== INDEXEDDB ====================
+    const DB_NAME = 'AudioRecorderDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'recordings';
+    let db = null;
+
+    // Initialisation de la base de données
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                db = request.result;
+                resolve(db);
+            };
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('date', 'date', { unique: false });
+                }
+            };
+        });
+    }
+
+    // Sauvegarder un enregistrement
+    async function saveRecording(blob, duration) {
+        if (!db) await initDB();
+        const id = Date.now();
+        const recording = {
+            id: id,
+            blob: blob,
+            date: new Date().toISOString(),
+            duration: duration,
+            name: `Enregistrement du ${new Date().toLocaleString()}`
+        };
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.add(recording);
+            request.onsuccess = () => resolve(id);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // Récupérer tous les enregistrements
+    async function getAllRecordings() {
+        if (!db) await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // Supprimer un enregistrement
+    async function deleteRecording(id) {
+        if (!db) await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.delete(id);
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // ==================== AFFICHAGE DES ENREGISTREMENTS ====================
+    function formatDuration(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function showToast(message, duration = 3000) {
+        toastEl.textContent = message;
+        toastEl.classList.add('show');
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+        }, duration);
+    }
+
+    async function renderRecordings() {
+        const recordings = await getAllRecordings();
+        if (recordings.length === 0) {
+            recordingsContainer.innerHTML = `
+                <div style="text-align: center; color: #94a3b8; padding: 2rem;">
+                    Aucun enregistrement pour le moment
+                </div>
+            `;
+            return;
+        }
+
+        recordingsContainer.innerHTML = '';
+        // Trier par date décroissante
+        recordings.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        for (const rec of recordings) {
+            const url = URL.createObjectURL(rec.blob);
+            const item = document.createElement('div');
+            item.className = 'recording-item';
+            item.innerHTML = `
+                <div class="audio-info">
+                    <audio controls src="${url}"></audio>
+                    <div class="audio-meta">
+                        📅 ${new Date(rec.date).toLocaleString()} • ⏱️ ${formatDuration(Math.floor(rec.duration))}
+                    </div>
+                </div>
+                <div class="share-buttons">
+                    <button class="share-btn" data-action="share" data-id="${rec.id}" data-url="${url}">🔗 Partager</button>
+                    <button class="share-btn" data-action="download" data-id="${rec.id}" data-url="${url}">💾 Télécharger</button>
+                    <button class="share-btn" data-action="delete" data-id="${rec.id}">🗑️ Supprimer</button>
+                </div>
+            `;
+            recordingsContainer.appendChild(item);
+        }
+
+        // Ajouter les événements après le rendu
+        document.querySelectorAll('[data-action="share"]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                const blob = (await getAllRecordings()).find(r => r.id === id)?.blob;
+                if (blob) {
+                    shareAudio(blob);
+                }
+            });
+        });
+
+        document.querySelectorAll('[data-action="download"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const url = btn.dataset.url;
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `recording_${Date.now()}.mp3`;
+                a.click();
+                showToast('Téléchargement démarré');
+            });
+        });
+
+        document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = parseInt(btn.dataset.id);
+                if (confirm('Supprimer cet enregistrement ?')) {
+                    await deleteRecording(id);
+                    showToast('Enregistrement supprimé');
+                    renderRecordings();
+                }
+            });
+        });
+    }
+
+    // ==================== PARTAGE AUDIO ====================
+    async function shareAudio(blob) {
+        // Créer un fichier à partir du blob
+        const file = new File([blob], `recording_${Date.now()}.mp3`, { type: 'audio/mpeg' });
+        
+        // Vérifier si l'API Web Share est disponible
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    title: 'Mon enregistrement audio',
+                    text: 'Écoutez mon message vocal !',
+                    files: [file]
+                });
+                showToast('Partagé avec succès !');
+                return;
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Erreur de partage:', err);
+                }
+            }
+        }
+        
+        // Fallback : créer un lien temporaire et le copier
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `recording_${Date.now()}.mp3`;
+        
+        // Alternative : copier le lien dans le presse-papier
+        try {
+            await navigator.clipboard.writeText(url);
+            showToast('🔗 Lien copié ! Collez-le pour partager.');
+        } catch (err) {
+            showToast('❌ Impossible de copier le lien. Téléchargez le fichier.');
+        }
+        
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+
+    // ==================== ENREGISTREMENT AUDIO ====================
+    async function startRecording() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+            
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                const duration = (Date.now() - startTime) / 1000;
+                await saveRecording(audioBlob, duration);
+                showToast('✅ Enregistrement sauvegardé !');
+                renderRecordings();
+                
+                // Nettoyer
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+            };
+            
+            mediaRecorder.start();
+            isRecording = true;
+            startTime = Date.now();
+            startTimer();
+            
+            // Mise à jour de l'interface
+            recordBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusEl.textContent = '🔴 Enregistrement en cours...';
+            recorderArea.classList.add('recording');
+            
+        } catch (err) {
+            console.error('Erreur microphone:', err);
+            statusEl.textContent = '❌ Impossible d\'accéder au microphone';
+            showToast('⚠️ Autorisez l\'accès au microphone pour enregistrer');
+        }
+    }
+    
+    function stopRecording() {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            isRecording = false;
+            stopTimer();
+            
+            recordBtn.disabled = false;
+            stopBtn.disabled = true;
+            statusEl.textContent = '✅ Enregistrement terminé';
+            recorderArea.classList.remove('recording');
+            
+            setTimeout(() => {
+                statusEl.textContent = 'Prêt à enregistrer';
+            }, 2000);
+        }
+    }
+    
+    // ==================== TIMER ====================
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+    
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerEl.textContent = '00:00';
+    }
+    
+    // ==================== INITIALISATION ====================
+    async function init() {
+        await initDB();
+        await renderRecordings();
+        
+        // Événements
+        recordBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+        
+        // Nettoyage à la fermeture
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    }
+    
+    init().catch(console.error);
+</script>
+</body>
+</html>
