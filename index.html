@@ -2,77 +2,86 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>AI Voice Coach - English Pronunciation Trainer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Voice Trainer - Mobile Optimized</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto;background:linear-gradient(135deg, #eef5f2 0%, #d4e4df 100%);padding:20px;min-height:100vh;}
-  .container{max-width:1000px;margin:0 auto;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;background:linear-gradient(135deg, #eef5f2 0%, #d4e4df 100%);padding:12px;min-height:100vh;}
+  .container{max-width:100%;margin:0 auto;}
   
-  .header{background:linear-gradient(135deg, #0d6e6e, #0a5555);color:white;padding:20px 25px;border-radius:28px;margin-bottom:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
-  .header h1{font-size:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
-  .badge{background:rgba(255,255,255,0.2);padding:5px 12px;border-radius:40px;font-size:0.8rem;}
+  .header{background:linear-gradient(135deg, #0d6e6e, #0a5555);color:white;padding:16px 20px;border-radius:24px;margin-bottom:16px;text-align:center;}
+  .header h1{font-size:1.3rem;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;}
+  .badge{background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:40px;font-size:0.7rem;}
   
-  .home-screen{background:white;border-radius:28px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.1);}
-  .home-screen h2{color:#0d6e6e;margin-bottom:20px;text-align:center;}
-  .text-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:20px;}
-  .text-card{background:#f8fafc;border:2px solid #e2e8f0;border-radius:20px;padding:18px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);}
-  .text-card:hover{transform:translateY(-5px);border-color:#0d6e6e;background:#e6f4f1;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
-  .text-card h3{color:#0d6e6e;margin-bottom:8px;font-size:1.1rem;}
-  .text-card p{font-size:0.85rem;color:#64748b;}
+  .home-screen{background:white;border-radius:24px;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+  .home-screen h2{color:#0d6e6e;margin-bottom:16px;text-align:center;font-size:1.2rem;}
+  .text-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;}
+  .text-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;cursor:pointer;transition:all 0.2s;}
+  .text-card:active{transform:scale(0.98);background:#e6f4f1;}
+  .text-card h3{color:#0d6e6e;margin-bottom:6px;font-size:1rem;}
+  .text-card p{font-size:0.75rem;color:#64748b;}
   
   .practice-screen{display:none;}
-  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:15px;}
-  .back-btn:hover{background:#cbd5e1;transform:translateY(-2px);}
+  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:12px;padding:10px 16px;font-size:0.9rem;}
+  .back-btn:active{transform:scale(0.98);}
   
-  .card{background:white;border-radius:28px;padding:24px;margin-bottom:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);}
-  .text-header{color:#0d6e6e;margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid #e2e8f0;}
-  .sentence-box{background:linear-gradient(135deg, #e6f4f1, #d0ebe6);border-left:5px solid #0d6e6e;padding:25px;border-radius:18px;margin-bottom:20px;}
-  .sentence-text{font-size:1.25rem;font-weight:500;line-height:1.5;color:#1a2e2a;}
-  .controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;justify-content:center;}
-  button{background:#0d6e6e;border:none;padding:12px 24px;border-radius:60px;color:white;font-weight:600;cursor:pointer;transition:all 0.2s ease;display:inline-flex;align-items:center;gap:8px;font-size:0.95rem;}
-  button:hover{background:#0a5555;transform:translateY(-2px);box-shadow:0 5px 15px rgba(13,110,110,0.3);}
+  .card{background:white;border-radius:24px;padding:16px;margin-bottom:16px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+  .text-header{margin-bottom:12px;}
+  .text-header h3{color:#0d6e6e;font-size:1rem;}
+  
+  .sentence-box{background:linear-gradient(135deg, #e6f4f1, #d0ebe6);border-left:4px solid #0d6e6e;padding:16px;border-radius:16px;margin-bottom:16px;}
+  .sentence-text{font-size:1rem;font-weight:500;line-height:1.4;color:#1a2e2a;word-break:break-word;}
+  
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;justify-content:center;}
+  button{background:#0d6e6e;border:none;padding:12px 20px;border-radius:40px;color:white;font-weight:600;cursor:pointer;transition:all 0.15s;font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;justify-content:center;min-width:100px;}
+  button:active{transform:scale(0.96);background:#0a5555;}
   button.outline{background:transparent;border:2px solid #0d6e6e;color:#0d6e6e;}
-  button.outline:hover{background:#e6f4f1;}
   button.danger{background:#e74c3c;}
-  button.danger:hover{background:#c0392b;}
   button.success{background:#27ae60;}
-  button:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+  button:disabled{opacity:0.5;transform:none;}
   
-  .visualizer{background:#1a1a2e;border-radius:24px;padding:20px;margin:20px 0;text-align:center;}
-  canvas{width:100%;height:120px;background:#0f0f1a;border-radius:20px;display:block;}
-  .status{margin-top:12px;font-weight:600;font-size:1rem;}
+  .visualizer{background:#1a1a2e;border-radius:20px;padding:16px;margin:16px 0;text-align:center;}
+  canvas{width:100%;height:80px;background:#0f0f1a;border-radius:16px;display:block;}
+  .status{margin-top:10px;font-weight:500;font-size:0.85rem;}
   .status.listening{color:#e74c3c;animation:pulse 1s infinite;}
   .status.success{color:#27ae60;}
-  .status.processing{color:#f5a623;}
+  
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
   
-  .progress-bar{height:12px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:15px 0;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623,#27ae60);width:0%;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);}
-  .progress-stats{display:flex;justify-content:space-between;font-size:0.85rem;margin-top:8px;}
+  .progress-bar{height:8px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:12px 0;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623,#27ae60);width:0%;transition:width 0.3s;}
+  .progress-stats{display:flex;justify-content:space-between;font-size:0.7rem;margin-top:5px;}
   
-  .feedback{margin-top:15px;padding:16px;border-radius:20px;transition:all 0.3s;}
-  .feedback-success{background:linear-gradient(135deg,#d4edda,#c8e6d9);border-left:5px solid #27ae60;color:#155724;}
-  .feedback-error{background:linear-gradient(135deg,#f8d7da,#ffebee);border-left:5px solid #e74c3c;color:#721c24;}
-  .feedback-warning{background:linear-gradient(135deg,#fff3cd,#ffeaa7);border-left:5px solid #f5a623;color:#856404;}
-  .feedback-info{background:linear-gradient(135deg,#d1ecf1,#bee0eb);border-left:5px solid #0d6e6e;color:#0c5460;}
+  .feedback{margin-top:12px;padding:12px;border-radius:16px;font-size:0.85rem;line-height:1.4;}
+  .feedback-success{background:#d4edda;border-left:4px solid #27ae60;color:#155724;}
+  .feedback-error{background:#f8d7da;border-left:4px solid #e74c3c;color:#721c24;}
+  .feedback-warning{background:#fff3cd;border-left:4px solid #f5a623;color:#856404;}
+  .feedback-info{background:#d1ecf1;border-left:4px solid #0d6e6e;color:#0c5460;}
   
-  .score-circle{display:inline-block;width:60px;height:60px;border-radius:50%;background:#1a1a2e;color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;margin-right:15px;}
+  .score-circle{display:inline-block;width:50px;height:50px;border-radius:50%;background:#1a1a2e;color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:1rem;margin-right:12px;}
   
-  .perm-alert{background:#fff3cd;border-radius:20px;padding:12px;margin-bottom:15px;display:none;}
+  .perm-alert{background:#fff3cd;border-radius:16px;padding:10px;margin-bottom:12px;display:none;font-size:0.8rem;flex-wrap:wrap;gap:8px;}
   .perm-alert.show{display:flex;justify-content:space-between;align-items:center;}
   
-  .micro-status{background:#e8f5e9;border-radius:20px;padding:8px 15px;margin-bottom:15px;text-align:center;font-size:0.85rem;color:#2e7d32;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .micro-status{background:#e8f5e9;border-radius:16px;padding:8px 12px;margin-bottom:12px;text-align:center;font-size:0.75rem;color:#2e7d32;display:flex;align-items:center;justify-content:center;gap:6px;}
   .micro-status.error{background:#ffebee;color:#c62828;}
   
-  @media(max-width:600px){.sentence-text{font-size:1rem;}.controls button{padding:8px 16px;font-size:0.85rem;}}
+  .mobile-warning{background:#ffe0b2;border-radius:12px;padding:8px 12px;margin-bottom:12px;font-size:0.7rem;text-align:center;color:#e65100;display:none;}
+  .mobile-warning.show{display:block;}
+  
+  @media(min-width:600px){
+    body{padding:20px;}
+    .text-grid{grid-template-columns:repeat(2,1fr);}
+    .sentence-text{font-size:1.1rem;}
+    button{padding:12px 24px;font-size:0.9rem;}
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>🎤 AI Voice Coach <span class="badge">Advanced Pronunciation</span></h1>
-    <p>Écoute, répète, l'IA analyse et corrige ta prononciation en temps réel</p>
+    <h1>🎤 Voice Trainer <span class="badge">Mobile Ready</span></h1>
+    <p style="font-size:0.8rem;margin-top:5px;">Écoute, répète, l'IA analyse ta prononciation</p>
   </div>
 
   <div id="homeScreen" class="home-screen">
@@ -85,12 +94,12 @@
     <div class="card">
       <div id="textHeader" class="text-header"></div>
       
-      <!-- Indicateur de statut du microphone -->
-      <div id="microStatus" class="micro-status">🎤 Initialisation du microphone...</div>
+      <div id="microStatus" class="micro-status">🎤 Touchez pour activer le micro</div>
+      <div id="mobileWarning" class="mobile-warning">📱 Sur iPhone, activez "Reconnaissance vocale" dans Réglages > Safari</div>
       
       <div class="controls">
         <button id="playBtn">🔊 Écouter</button>
-        <button id="repeatBtn" style="background:#f5a623;">🎤 IA Écoute & Analyse</button>
+        <button id="repeatBtn" style="background:#f5a623;">🎤 Parler</button>
         <button id="nextBtn" class="outline" disabled>⏩ Suivant</button>
         <button id="resetBtn" class="danger">🔄 Reset</button>
       </div>
@@ -100,13 +109,13 @@
       </div>
 
       <div id="permAlert" class="perm-alert">
-        <span>🎤 Autorisez le microphone pour l'analyse IA</span>
-        <button id="requestMicBtn" style="background:#f5a623; padding:6px 12px;">Autoriser</button>
+        <span>🎤 Microphone requis</span>
+        <button id="requestMicBtn" style="background:#f5a623; padding:6px 12px;">Activer</button>
       </div>
 
       <div class="visualizer">
-        <canvas id="voiceCanvas" width="800" height="120"></canvas>
-        <div class="status" id="voiceStatus">🎤 En attente</div>
+        <canvas id="voiceCanvas" width="400" height="80"></canvas>
+        <div class="status" id="voiceStatus">🎤 Appuyez sur "Parler"</div>
       </div>
 
       <div class="progress-bar">
@@ -117,66 +126,42 @@
         <span id="progressText">0%</span>
       </div>
 
-      <div id="feedback" class="feedback feedback-info">💡 Cliquez sur "IA Écoute & Analyse" pour commencer</div>
+      <div id="feedback" class="feedback feedback-info">💡 Appuyez sur "Parler" pour commencer</div>
     </div>
   </div>
 </div>
 
 <script>
-  // ========== TEXTES ==========
+  // ========== TEXTES SIMPLIFIÉS POUR MOBILE ==========
   const textsData = {
     entrepreneurship: {
       title: "ENTREPRENEURSHIP",
-      shortDesc: "Types d'entrepreneuriat : small business, scalable startup, large company, social",
-      fullText: `Entrepreneurship is the ability and readiness to develop, organize and run a business enterprise, along with any of its uncertainties in order to make a profit. The most prominent example of entrepreneurship is the starting of new businesses.
-In economics, entrepreneurship connected with land, labour, natural resources and capital can generate a profit. The entrepreneurial vision is defined by discovery and risk-taking.
-Small Business Entrepreneurship: These businesses are a hairdresser, grocery store, travel agent, consultant, carpenter, plumber, electrician, etc. They run their own business and hire family members or local employees.
-Scalable Startup Entrepreneurship: It starts a business knowing that their vision can change the world. They attract investors who encourage people who think out of the box.
-Large Company Entrepreneurship: These huge companies grow and sustain by offering new and innovative products that revolve around their main products.
-Social Entrepreneurship: This type focuses on producing products and services that resolve social needs and problems. Their goal is to work for society and not make profits.`
+      shortDesc: "Types d'entrepreneuriat",
+      fullText: `Entrepreneurship is the ability to develop and run a business. Small businesses include hairdressers, grocery stores, and carpenters. Scalable startups aim to change the world with innovative ideas. Large companies grow by offering new products. Social entrepreneurship focuses on solving society's problems.`
     },
     fitness: {
-      title: "THE IMPORTANCE OF PHYSICAL FITNESS",
+      title: "PHYSICAL FITNESS",
       shortDesc: "Bienfaits de l'activité physique",
-      fullText: `Physical activity and exercise is important for everyone. Children, adolescents, and adults of all ages need regular physical activity. Physical activity promotes good health and you should stay active throughout all stages of your life.
-Regular physical activity increases life expectancy and reduces the risk of premature mortality. People who are more active tend to be healthier and tend to live longer.
-Regular exercise increases muscle strength, bone density, flexibility, and stability. Physical fitness can reduce your risk for accidental injuries, especially as you get older.
-A sedentary lifestyle can take a toll on a person's body. Exercise has been shown to improve mood and mental health, and provides numerous health benefits.`
-    },
-    exports: {
-      title: "EXPORTS AND IMPORTS",
-      shortDesc: "Rôle des exportations et importations",
-      fullText: `Exports and imports play an important role in determining the overall health of an economy. Exports are goods and services a country sells to businesses or customers in a foreign country.
-Imports are goods and services a business or customer purchases from another country. Most countries try to export more than they import to increase domestic revenue.
-Exports and imports make up a country's balance of trade, which impacts an economy's overall health. A trade surplus occurs when exports are greater than imports. A trade deficit occurs when imports are greater than exports.`
-    },
-    ai: {
-      title: "ARTIFICIAL INTELLIGENCE",
-      shortDesc: "L'impact global de l'IA",
-      fullText: `Artificial intelligence is a rapidly evolving technology. It has the potential to transform society across all sectors of industries and governments. AI is a field of computer science focused on creating machines that perform tasks requiring human intelligence.
-AI has been used in medical diagnosis, autonomous cars, home automation, social media, chatbots, virtual assistance, and financial analysis. AI can increase economic growth through improved productivity.
-On the other hand, AI can lead to job displacement and increase economic inequality. The ethical implications of AI include issues of bias, privacy, security, and accountability.`
+      fullText: `Physical activity is important for everyone. It promotes good health and increases life expectancy. Regular exercise reduces the risk of heart disease and diabetes. Physical fitness improves muscle strength, bone density, and flexibility. An active lifestyle helps you live longer and healthier.`
     },
     malaria: {
       title: "MALARIA",
-      shortDesc: "Causes, symptômes et prévention du paludisme",
-      fullText: `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites that cause different symptoms.
-The symptoms of malaria appear 9 to 30 days after infection. For the most common species, the incubation period is usually 9 to 14 days.
-Malaria can be simple or complicated. Simple malaria manifests as a flu-like illness with fever, headache, chills, and muscle pain. Complicated malaria occurs when the parasite reaches a vital organ.
-Prevention is essential in the fight against malaria. It includes sanitation of wetlands, spraying mosquito repellents, and protecting homes with mosquito nets.`
+      shortDesc: "Causes et prévention du paludisme",
+      fullText: `Malaria is caused by a parasite transmitted by mosquito bites. Symptoms appear 9 to 30 days after infection. The disease can be mild or severe. Prevention includes using mosquito nets and repellents. Early treatment is essential to save lives.`
+    },
+    ai: {
+      title: "ARTIFICIAL INTELLIGENCE",
+      shortDesc: "L'impact de l'IA",
+      fullText: `Artificial intelligence is a rapidly growing technology. AI helps in medical diagnosis, autonomous cars, and virtual assistants. However, AI can also lead to job displacement. The ethical use of AI requires privacy protection and transparency.`
     },
     deforestation: {
       title: "DEFORESTATION",
-      shortDesc: "Causes et conséquences de la déforestation",
-      fullText: `Deforestation is the removal and destruction of a forest or stand of trees from land that is then converted to non-forest use. About 31 percent of Earth's land surface is covered by forests at present.
-The causes of deforestation are complex, often interwoven with economic, social, and political factors. One primary driver is agricultural expansion, where forests are cleared for crops and livestock.
-Another factor is logging, both legal and illegal. The timber industry provides jobs and resources, but unsustainable logging leads to severe ecological damage.
-Forests act as carbon sinks. When they are destroyed, carbon is released and the capacity for future carbon absorption is diminished. Reforestation involves planting trees in areas where forests have been cut down.`
+      shortDesc: "Causes et conséquences",
+      fullText: `Deforestation is the destruction of forests for agriculture or urban use. About 31 percent of Earth's land is covered by forests. The main causes are agricultural expansion and logging. Deforestation leads to loss of biodiversity and climate change. Reforestation helps restore damaged forests.`
     }
   };
 
-  // ========== Découpage intelligent ==========
-  function splitSentences(text, maxLen=100) {
+  function splitSentences(text, maxLen=90) {
     let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
     let segments = [];
     for (let s of sentences) {
@@ -185,18 +170,17 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       if (s.length <= maxLen) {
         segments.push(s);
       } else {
-        let parts = s.split(/[,;:]/);
+        let words = s.split(' ');
         let current = '';
-        for (let part of parts) {
-          part = part.trim();
-          if (current.length + part.length + 2 <= maxLen) {
-            current = current ? current + ', ' + part : part;
+        for (let w of words) {
+          if ((current + ' ' + w).length <= maxLen) {
+            current = current ? current + ' ' + w : w;
           } else {
-            if (current) segments.push(current + '.');
-            current = part;
+            if (current) segments.push(current);
+            current = w;
           }
         }
-        if (current) segments.push(current + '.');
+        if (current) segments.push(current);
       }
     }
     return segments;
@@ -207,16 +191,12 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   let currentIndex = 0;
   let progress = [];
   
-  // Audio variables - GLOBALES et PERSISTANTES
   let mediaStream = null;
-  let audioContext = null;
-  let analyser = null;
-  let animationId = null;
   let isRecording = false;
+  let animationId = null;
   let recognition = null;
   let isWaitingForNext = false;
   let isMicrophoneReady = false;
-  let isMicrophoneRequested = false;
 
   // DOM
   const homeScreen = document.getElementById('homeScreen');
@@ -238,17 +218,15 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   const canvas = document.getElementById('voiceCanvas');
   const ctx = canvas.getContext('2d');
   const microStatusDiv = document.getElementById('microStatus');
+  const mobileWarning = document.getElementById('mobileWarning');
 
   function resizeCanvas() {
-    if (canvas.parentElement) {
-      canvas.width = canvas.parentElement.clientWidth - 40;
-      canvas.height = 120;
-    }
+    canvas.width = Math.min(canvas.parentElement.clientWidth - 40, 400);
+    canvas.height = 80;
   }
   window.addEventListener('resize', resizeCanvas);
   
-  // Progression
-  function getStorageKey() { return `pronunciation_progress_${currentTextId}`; }
+  function getStorageKey() { return `mobile_progress_${currentTextId}`; }
   
   function loadProgress() {
     let saved = localStorage.getItem(getStorageKey());
@@ -288,7 +266,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       progress[currentIndex] = true;
       saveProgress();
       updateNextButton();
-      showFeedback(`✅ Parfait ! Phrase ${currentIndex+1} validée !`, 'success');
+      showFeedback(`✅ Phrase ${currentIndex+1} validée !`, 'success');
       return true;
     }
     return false;
@@ -309,19 +287,21 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     feedbackDiv.className = `feedback ${className}`;
     setTimeout(() => {
       if (feedbackDiv.innerHTML === msg || feedbackDiv.innerHTML.includes(msg)) {
-        feedbackDiv.innerHTML = '💡 Cliquez sur "IA Écoute & Analyse" pour continuer';
+        feedbackDiv.innerHTML = '💡 Appuyez sur "Parler" pour continuer';
         feedbackDiv.className = 'feedback feedback-info';
       }
-    }, 5000);
+    }, 4000);
   }
 
-  // Synthèse vocale
+  // Synthèse vocale mobile compatible
   function speak(text, callback) {
-    if (!window.speechSynthesis) return;
+    if (!window.speechSynthesis) {
+      showFeedback("❌ Synthèse vocale non disponible", "error");
+      return;
+    }
     let utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
     utter.rate = 0.85;
-    utter.pitch = 1;
     utter.onend = () => { if(callback) callback(); };
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utter);
@@ -329,7 +309,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
 
   function playCurrent() {
     speak(segments[currentIndex]);
-    showFeedback(`🔊 Écoute - Phrase ${currentIndex+1}/${segments.length}`, 'info');
+    showFeedback(`🔊 Écoute - ${currentIndex+1}/${segments.length}`, 'info');
   }
 
   function playBeep() {
@@ -341,15 +321,15 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       gain.connect(ctxBeep.destination);
       osc.frequency.value = 880;
       osc.type = 'sine';
-      gain.gain.value = 0.25;
+      gain.gain.value = 0.15;
       osc.start();
-      gain.gain.exponentialRampToValueAtTime(0.00001, ctxBeep.currentTime + 0.4);
-      osc.stop(ctxBeep.currentTime + 0.4);
-      setTimeout(() => ctxBeep.close(), 500);
+      gain.gain.exponentialRampToValueAtTime(0.00001, ctxBeep.currentTime + 0.3);
+      osc.stop(ctxBeep.currentTime + 0.3);
+      setTimeout(() => ctxBeep.close(), 400);
     } catch(e) {}
   }
 
-  // ========== INITIALISATION UNIQUE DU MICROPHONE ==========
+  // Initialisation microphone mobile
   async function initMicrophone() {
     if (isMicrophoneReady && mediaStream && mediaStream.active) {
       microStatusDiv.innerHTML = '🎤 Microphone actif ✅';
@@ -357,13 +337,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       return true;
     }
     
-    if (isMicrophoneRequested) {
-      microStatusDiv.innerHTML = '🎤 Demande en cours...';
-      return false;
-    }
-    
-    isMicrophoneRequested = true;
-    microStatusDiv.innerHTML = '🎤 Demande d\'accès au microphone...';
+    microStatusDiv.innerHTML = '🎤 Demande d\'accès...';
     
     try {
       let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -371,68 +345,68 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       if (mediaStream) {
         mediaStream.getTracks().forEach(t => t.stop());
       }
-      if (audioContext) await audioContext.close();
       
       mediaStream = stream;
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      let source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-      await audioContext.resume();
-      
       isMicrophoneReady = true;
-      isMicrophoneRequested = false;
       permAlert.classList.remove('show');
-      microStatusDiv.innerHTML = '🎤 Microphone actif ✅ Prêt pour l\'analyse vocale';
+      microStatusDiv.innerHTML = '🎤 Microphone actif ✅';
       microStatusDiv.className = 'micro-status';
-      showFeedback('🎤 Microphone prêt ! Cliquez sur "IA Écoute & Analyse"', 'success');
+      mobileWarning.classList.remove('show');
+      showFeedback('🎤 Microphone prêt ! Appuyez sur "Parler"', 'success');
       return true;
       
     } catch(err) {
       console.error(err);
       isMicrophoneReady = false;
-      isMicrophoneRequested = false;
-      microStatusDiv.innerHTML = '🎤❌ Microphone non autorisé';
+      microStatusDiv.innerHTML = '🎤❌ Micro non autorisé';
       microStatusDiv.className = 'micro-status error';
       permAlert.classList.add('show');
-      showFeedback('❌ Activez le microphone dans les paramètres du navigateur', 'error');
+      
+      if (err.name === 'NotAllowedError') {
+        mobileWarning.classList.add('show');
+        showFeedback('❌ Autorisez le microphone dans les paramètres de votre navigateur', 'error');
+      }
       return false;
     }
   }
 
-  // Visualisation
+  // Visualisation simple pour mobile
   function startVisualization() {
     if (animationId) cancelAnimationFrame(animationId);
-    if (!analyser) return;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    
+    let amplitude = 0;
+    let increasing = true;
     
     function draw() {
-      if (!isRecording || !analyser) {
+      if (!isRecording) {
         if (animationId) cancelAnimationFrame(animationId);
+        ctx.fillStyle = '#0f0f1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         return;
       }
-      analyser.getByteTimeDomainData(dataArray);
+      
       ctx.fillStyle = '#0f0f1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      let sliceWidth = canvas.width / bufferLength;
-      let x = 0;
-      ctx.beginPath();
-      let maxAmp = 0;
-      for (let i = 0; i < bufferLength; i++) {
-        let v = dataArray[i] / 128.0;
-        let amplitude = Math.abs(v - 1);
-        if (amplitude > maxAmp) maxAmp = amplitude;
-        let y = (v * canvas.height) / 2;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-        x += sliceWidth;
+      if (increasing) {
+        amplitude += 2;
+        if (amplitude >= 40) increasing = false;
+      } else {
+        amplitude -= 2;
+        if (amplitude <= 5) increasing = true;
       }
-      ctx.strokeStyle = maxAmp > 0.15 ? '#e74c3c' : maxAmp > 0.05 ? '#f5a623' : '#0d6e6e';
+      
+      ctx.beginPath();
+      ctx.strokeStyle = '#0d6e6e';
       ctx.lineWidth = 3;
+      
+      for (let x = 0; x < canvas.width; x += 4) {
+        let y = canvas.height/2 + Math.sin(x * 0.05 + Date.now() * 0.01) * amplitude;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
       ctx.stroke();
+      
       animationId = requestAnimationFrame(draw);
     }
     draw();
@@ -445,76 +419,38 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Algorithme de similarité
-  function advancedSimilarity(spoken, target) {
-    let spokenNorm = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
-    let targetNorm = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
+  // Similarité simplifiée mais efficace
+  function calculateSimilarity(spoken, target) {
+    let a = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    let b = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
     
-    if (spokenNorm === targetNorm) return 1;
-    if (spokenNorm.length === 0 || targetNorm.length === 0) return 0;
+    if (a === b) return 1;
+    if (a.length === 0 || b.length === 0) return 0;
     
-    let spokenWords = spokenNorm.split(/\s+/);
-    let targetWords = targetNorm.split(/\s+/);
+    let wordsA = a.split(/\s+/);
+    let wordsB = b.split(/\s+/);
+    let matches = 0;
     
-    let totalScore = 0;
-    let maxPossible = targetWords.length;
-    
-    for (let i = 0; i < targetWords.length; i++) {
-      let targetWord = targetWords[i];
-      let bestMatch = 0;
-      
-      for (let j = 0; j < spokenWords.length; j++) {
-        let spokenWord = spokenWords[j];
-        
-        if (spokenWord === targetWord) {
-          bestMatch = 1;
+    for (let wa of wordsA) {
+      for (let wb of wordsB) {
+        if (wb === wa || wa.includes(wb) || wb.includes(wa) || 
+            (wa.length > 3 && wb.length > 3 && (wa.substring(0,3) === wb.substring(0,3)))) {
+          matches++;
           break;
         }
-        if (spokenWord.includes(targetWord) || targetWord.includes(spokenWord)) {
-          bestMatch = Math.max(bestMatch, 0.85);
-        }
-        else {
-          let len = Math.max(spokenWord.length, targetWord.length);
-          let dist = levenshteinDistance(spokenWord, targetWord);
-          let sim = 1 - (dist / len);
-          bestMatch = Math.max(bestMatch, sim * 0.8);
-        }
-      }
-      totalScore += bestMatch;
-    }
-    
-    let orderBonus = 0;
-    for (let i = 0; i < Math.min(spokenWords.length, targetWords.length); i++) {
-      if (spokenWords[i] === targetWords[i]) orderBonus += 0.05;
-    }
-    
-    let finalScore = (totalScore / maxPossible) + Math.min(orderBonus, 0.2);
-    return Math.min(finalScore, 1);
-  }
-  
-  function levenshteinDistance(a, b) {
-    const matrix = Array(b.length + 1).fill().map(() => Array(a.length + 1).fill(0));
-    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
-    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
-    for (let j = 1; j <= b.length; j++) {
-      for (let i = 1; i <= a.length; i++) {
-        const cost = a[i-1] === b[j-1] ? 0 : 1;
-        matrix[j][i] = Math.min(
-          matrix[j][i-1] + 1,
-          matrix[j-1][i] + 1,
-          matrix[j-1][i-1] + cost
-        );
       }
     }
-    return matrix[b.length][a.length];
+    
+    let ratio = matches / Math.max(wordsA.length, wordsB.length);
+    return Math.min(ratio + 0.15, 1);
   }
 
-  // ========== RECONNAISSANCE VOCALE AVEC MICROPHONE PERSISTANT ==========
+  // Reconnaissance vocale mobile
   function startSpeechRecognition() {
     if (!isMicrophoneReady) {
-      showFeedback("🎤 Initialisation du microphone...", "warning");
       initMicrophone().then(success => {
         if (success) startSpeechRecognitionInternal();
+        else showFeedback("🎤 Activez d'abord le microphone", "warning");
       });
       return;
     }
@@ -523,7 +459,8 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   
   function startSpeechRecognitionInternal() {
     if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
-      showFeedback("❌ Utilisez Chrome ou Edge pour la reconnaissance vocale", "error");
+      showFeedback("📱 Sur iPhone, allez dans Réglages > Safari > Reconnaissance vocale", "warning");
+      mobileWarning.classList.add('show');
       return;
     }
     
@@ -535,49 +472,34 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     recognition = new SpeechRecog();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
-    recognition.maxAlternatives = 3;
+    recognition.maxAlternatives = 1;
     recognition.continuous = false;
 
     recognition.onstart = () => {
       isRecording = true;
-      voiceStatus.innerHTML = '🎤🔴 IA en écoute... Parlez clairement';
+      voiceStatus.innerHTML = '🎤🔴 Parlez maintenant...';
       voiceStatus.className = 'status listening';
       startVisualization();
     };
 
     recognition.onresult = (event) => {
-      let bestTranscript = '';
-      let bestConfidence = 0;
-      
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          for (let j = 0; j < event.results[i].length; j++) {
-            if (event.results[i][j].confidence > bestConfidence) {
-              bestConfidence = event.results[i][j].confidence;
-              bestTranscript = event.results[i][j].transcript;
-            }
-          }
-        }
-      }
-      
-      if (bestTranscript) {
-        evaluateAdvanced(bestTranscript);
-      } else if (event.results[0][0]) {
-        evaluateAdvanced(event.results[0][0].transcript);
-      }
+      let transcript = event.results[0][0].transcript;
+      evaluateSimilarityScore(transcript);
     };
 
     recognition.onerror = (event) => {
       if (event.error === 'not-allowed') {
         isMicrophoneReady = false;
         permAlert.classList.add('show');
-        showFeedback("❌ Autorisez le microphone dans les paramètres", "error");
+        showFeedback("❌ Autorisez le microphone", "error");
       } else if (event.error === 'no-speech') {
         showFeedback("🎤 Aucun son détecté. Parlez plus fort", "warning");
-        voiceStatus.innerHTML = '🎤 En attente';
+        voiceStatus.innerHTML = '🎤 Prêt';
         voiceStatus.className = '';
+      } else if (event.error === 'audio-capture') {
+        showFeedback("🎤 Microphone non trouvé. Vérifiez vos permissions", "error");
       } else {
-        showFeedback(`❌ Erreur: ${event.error}. Réessayez`, "error");
+        showFeedback(`❌ ${event.error}. Réessayez`, "error");
       }
       stopListening();
     };
@@ -592,8 +514,13 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
 
     try {
       recognition.start();
+      setTimeout(() => {
+        if (recognition && isRecording) {
+          try { recognition.stop(); } catch(e) {}
+        }
+      }, 8000);
     } catch(e) {
-      showFeedback("Erreur de démarrage", "error");
+      showFeedback("Appuyez à nouveau sur Parler", "warning");
     }
   }
 
@@ -602,16 +529,16 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     stopVisualization();
   }
 
-  function evaluateAdvanced(spoken) {
+  function evaluateSimilarityScore(spoken) {
     const target = segments[currentIndex];
-    const similarity = advancedSimilarity(spoken, target);
+    const similarity = calculateSimilarity(spoken, target);
     const percent = Math.round(similarity * 100);
     
-    voiceStatus.innerHTML = `🎤✅ Analyse: ${percent}% de correspondance`;
+    voiceStatus.innerHTML = `🎤✅ ${percent}%`;
     voiceStatus.className = 'status success';
     
-    if (similarity >= 0.78) {
-      showFeedback(`Excellent ! ${percent}% - Prononciation très proche du modèle`, 'success', percent);
+    if (similarity >= 0.7) {
+      showFeedback(`Excellent ! ${percent}%`, 'success', percent);
       const validated = markCurrentDone();
       
       if (validated && currentIndex + 1 < segments.length) {
@@ -623,14 +550,12 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
           showFeedback(`📖 Phrase ${currentIndex+1}/${segments.length}`, 'info');
         }, 2000);
       } else if (validated && currentIndex + 1 >= segments.length) {
-        setTimeout(() => showFeedback("🏆 Félicitations ! Texte terminé !", "success"), 1500);
+        setTimeout(() => showFeedback("🏆 Texte terminé !", "success"), 1500);
       }
-    } else if (similarity >= 0.6) {
-      showFeedback(`Bon travail ! ${percent}% - Quelques mots à améliorer, réessayez`, 'warning', percent);
-    } else if (similarity >= 0.4) {
-      showFeedback(`👍 ${percent}% - Écoutez bien et répétez plus lentement`, 'warning', percent);
+    } else if (similarity >= 0.5) {
+      showFeedback(`👍 ${percent}% - Encore un effort`, 'warning', percent);
     } else {
-      showFeedback(`📚 ${percent}% - Réécoutez la phrase et répétez mot par mot`, 'error', percent);
+      showFeedback(`📚 ${percent}% - Réécoutez et réessayez`, 'error', percent);
     }
     
     setTimeout(() => {
@@ -638,7 +563,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
         voiceStatus.innerHTML = '🎤 Prêt';
         voiceStatus.className = '';
       }
-    }, 3000);
+    }, 2500);
   }
 
   async function fullRepeatSequence() {
@@ -647,20 +572,17 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     
     if (!isMicrophoneReady) {
       let ok = await initMicrophone();
-      if (!ok) { 
-        isWaitingForNext = false; 
-        return; 
-      }
+      if (!ok) { isWaitingForNext = false; return; }
     }
     
-    showFeedback("🔊 Écoute du modèle...", "info");
+    showFeedback("🔊 Écoute...", "info");
     speak(segments[currentIndex], () => {
       playBeep();
-      showFeedback("🎤 Après le bip, répétez la phrase", "warning");
+      showFeedback("🎤 Parlez maintenant", "warning");
       setTimeout(() => {
         startSpeechRecognition();
-        setTimeout(() => { isWaitingForNext = false; }, 5000);
-      }, 400);
+        setTimeout(() => { isWaitingForNext = false; }, 6000);
+      }, 300);
     });
   }
 
@@ -673,10 +595,10 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
         updateNextButton();
         showFeedback(`📖 Phrase ${currentIndex+1}/${segments.length}`, 'info');
       } else {
-        showFeedback("🎉 Texte terminé ! Félicitations !", "success");
+        showFeedback("🎉 Texte terminé !", "success");
       }
     } else {
-      showFeedback("⚠️ Validez d'abord cette phrase avec l'IA", "warning");
+      showFeedback("⚠️ Validez d'abord cette phrase", "warning");
     }
   }
 
@@ -694,7 +616,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   function loadText(textId) {
     currentTextId = textId;
     const textData = textsData[textId];
-    segments = splitSentences(textData.fullText, 100);
+    segments = splitSentences(textData.fullText, 90);
     textHeader.innerHTML = `<h3>📖 ${textData.title}</h3>`;
     loadProgress();
     resizeCanvas();
@@ -702,7 +624,6 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     practiceScreen.style.display = 'block';
     isWaitingForNext = false;
     
-    // Réinitialiser l'état de reconnaissance sans fermer le micro
     if (recognition) {
       try { recognition.stop(); } catch(e) {}
     }
@@ -715,7 +636,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     for (let [id, data] of Object.entries(textsData)) {
       const card = document.createElement('div');
       card.className = 'text-card';
-      card.innerHTML = `<h3>${data.title}</h3><p>${data.shortDesc}</p><span style="font-size:0.7rem;color:#0d6e6e;">🎤 Entraînement IA</span>`;
+      card.innerHTML = `<h3>${data.title}</h3><p>${data.shortDesc}</p>`;
       card.addEventListener('click', () => loadText(id));
       textGrid.appendChild(card);
     }
@@ -726,28 +647,28 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   repeatBtn.addEventListener('click', fullRepeatSequence);
   nextBtn.addEventListener('click', nextSegment);
   resetBtn.addEventListener('click', resetAll);
-  requestMicBtn.addEventListener('click', async () => { 
-    await initMicrophone();
-  });
+  requestMicBtn.addEventListener('click', () => initMicrophone());
   backToHomeBtn.addEventListener('click', () => {
     homeScreen.style.display = 'block';
     practiceScreen.style.display = 'none';
     isWaitingForNext = false;
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (practiceScreen.style.display !== 'block') return;
-    if (e.code === 'Space') { e.preventDefault(); playCurrent(); }
-    if (e.code === 'KeyR') { e.preventDefault(); fullRepeatSequence(); }
-    if (e.code === 'KeyN') { e.preventDefault(); nextSegment(); }
-  });
+  // Détection iOS pour afficher un message
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    mobileWarning.classList.add('show');
+    mobileWarning.innerHTML = '📱 Sur iPhone : Réglages > Safari > Microphone > Autoriser';
+  }
 
-  // Démarrage - initialisation silencieuse
   buildHomeScreen();
   resizeCanvas();
   
-  // Initialisation automatique et silencieuse du microphone au chargement
-  initMicrophone().catch(() => {});
+  // Demander le micro au premier touch (requis pour iOS)
+  document.body.addEventListener('touchstart', function initMicroOnTouch() {
+    initMicrophone().catch(() => {});
+    document.body.removeEventListener('touchstart', initMicroOnTouch);
+  }, { once: true });
 </script>
 </body>
 </html>
