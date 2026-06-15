@@ -2,54 +2,51 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Voice Trainer - Mobile Optimized</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Voice Trainer - English Pronunciation</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;background:linear-gradient(135deg, #eef5f2 0%, #d4e4df 100%);padding:12px;min-height:100vh;}
-  .container{max-width:100%;margin:0 auto;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;background:#eef5f2;padding:12px;min-height:100vh;}
+  .container{max-width:800px;margin:0 auto;}
   
-  .header{background:linear-gradient(135deg, #0d6e6e, #0a5555);color:white;padding:16px 20px;border-radius:24px;margin-bottom:16px;text-align:center;}
-  .header h1{font-size:1.3rem;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;}
-  .badge{background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:40px;font-size:0.7rem;}
+  .header{background:#0d6e6e;color:white;padding:16px 20px;border-radius:24px;margin-bottom:16px;text-align:center;}
+  .header h1{font-size:1.3rem;}
+  .header p{font-size:0.8rem;margin-top:5px;opacity:0.9;}
   
-  .home-screen{background:white;border-radius:24px;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
-  .home-screen h2{color:#0d6e6e;margin-bottom:16px;text-align:center;font-size:1.2rem;}
-  .text-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;}
-  .text-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;cursor:pointer;transition:all 0.2s;}
-  .text-card:active{transform:scale(0.98);background:#e6f4f1;}
-  .text-card h3{color:#0d6e6e;margin-bottom:6px;font-size:1rem;}
+  .home-screen{background:white;border-radius:24px;padding:20px;}
+  .home-screen h2{color:#0d6e6e;margin-bottom:15px;text-align:center;font-size:1.2rem;}
+  .text-grid{display:flex;flex-direction:column;gap:10px;}
+  .text-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:15px;cursor:pointer;transition:all 0.2s;}
+  .text-card:active{background:#e6f4f1;transform:scale(0.98);}
+  .text-card h3{color:#0d6e6e;margin-bottom:5px;font-size:1rem;}
   .text-card p{font-size:0.75rem;color:#64748b;}
   
   .practice-screen{display:none;}
-  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:12px;padding:10px 16px;font-size:0.9rem;}
-  .back-btn:active{transform:scale(0.98);}
+  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:12px;padding:10px 16px;font-size:0.9rem;width:100%;}
   
-  .card{background:white;border-radius:24px;padding:16px;margin-bottom:16px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
-  .text-header{margin-bottom:12px;}
+  .card{background:white;border-radius:24px;padding:16px;margin-bottom:16px;}
+  .text-header{margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;}
   .text-header h3{color:#0d6e6e;font-size:1rem;}
   
-  .sentence-box{background:linear-gradient(135deg, #e6f4f1, #d0ebe6);border-left:4px solid #0d6e6e;padding:16px;border-radius:16px;margin-bottom:16px;}
+  .sentence-box{background:#e6f4f1;border-left:4px solid #0d6e6e;padding:16px;border-radius:16px;margin-bottom:16px;}
   .sentence-text{font-size:1rem;font-weight:500;line-height:1.4;color:#1a2e2a;word-break:break-word;}
   
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;justify-content:center;}
-  button{background:#0d6e6e;border:none;padding:12px 20px;border-radius:40px;color:white;font-weight:600;cursor:pointer;transition:all 0.15s;font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;justify-content:center;min-width:100px;}
+  button{background:#0d6e6e;border:none;padding:12px 20px;border-radius:40px;color:white;font-weight:600;font-size:0.85rem;cursor:pointer;min-width:100px;}
   button:active{transform:scale(0.96);background:#0a5555;}
   button.outline{background:transparent;border:2px solid #0d6e6e;color:#0d6e6e;}
   button.danger{background:#e74c3c;}
   button.success{background:#27ae60;}
   button:disabled{opacity:0.5;transform:none;}
   
-  .visualizer{background:#1a1a2e;border-radius:20px;padding:16px;margin:16px 0;text-align:center;}
-  canvas{width:100%;height:80px;background:#0f0f1a;border-radius:16px;display:block;}
-  .status{margin-top:10px;font-weight:500;font-size:0.85rem;}
+  .visualizer{background:#1a1a2e;border-radius:20px;padding:15px;margin:12px 0;text-align:center;}
+  canvas{width:100%;height:60px;background:#0f0f1a;border-radius:12px;}
+  .status{margin-top:8px;font-size:0.8rem;font-weight:500;}
   .status.listening{color:#e74c3c;animation:pulse 1s infinite;}
-  .status.success{color:#27ae60;}
-  
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
   
-  .progress-bar{height:8px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:12px 0;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623,#27ae60);width:0%;transition:width 0.3s;}
+  .progress-bar{height:8px;background:#e0e0e0;border-radius:10px;margin:12px 0;}
+  .progress-fill{height:100%;background:#0d6e6e;width:0%;border-radius:10px;transition:width 0.3s;}
   .progress-stats{display:flex;justify-content:space-between;font-size:0.7rem;margin-top:5px;}
   
   .feedback{margin-top:12px;padding:12px;border-radius:16px;font-size:0.85rem;line-height:1.4;}
@@ -58,30 +55,20 @@
   .feedback-warning{background:#fff3cd;border-left:4px solid #f5a623;color:#856404;}
   .feedback-info{background:#d1ecf1;border-left:4px solid #0d6e6e;color:#0c5460;}
   
-  .score-circle{display:inline-block;width:50px;height:50px;border-radius:50%;background:#1a1a2e;color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:1rem;margin-right:12px;}
-  
-  .perm-alert{background:#fff3cd;border-radius:16px;padding:10px;margin-bottom:12px;display:none;font-size:0.8rem;flex-wrap:wrap;gap:8px;}
-  .perm-alert.show{display:flex;justify-content:space-between;align-items:center;}
-  
-  .micro-status{background:#e8f5e9;border-radius:16px;padding:8px 12px;margin-bottom:12px;text-align:center;font-size:0.75rem;color:#2e7d32;display:flex;align-items:center;justify-content:center;gap:6px;}
-  .micro-status.error{background:#ffebee;color:#c62828;}
-  
-  .mobile-warning{background:#ffe0b2;border-radius:12px;padding:8px 12px;margin-bottom:12px;font-size:0.7rem;text-align:center;color:#e65100;display:none;}
-  .mobile-warning.show{display:block;}
+  .mic-status{background:#e8f5e9;border-radius:12px;padding:8px;margin-bottom:12px;text-align:center;font-size:0.75rem;color:#2e7d32;}
+  .mic-status.error{background:#ffebee;color:#c62828;}
   
   @media(min-width:600px){
     body{padding:20px;}
-    .text-grid{grid-template-columns:repeat(2,1fr);}
-    .sentence-text{font-size:1.1rem;}
-    button{padding:12px 24px;font-size:0.9rem;}
+    .text-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
   }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>🎤 Voice Trainer <span class="badge">Mobile Ready</span></h1>
-    <p style="font-size:0.8rem;margin-top:5px;">Écoute, répète, l'IA analyse ta prononciation</p>
+    <h1>🎤 Voice Trainer</h1>
+    <p>Écoutez → Appuyez sur Parler → Répétez</p>
   </div>
 
   <div id="homeScreen" class="home-screen">
@@ -90,12 +77,11 @@
   </div>
 
   <div id="practiceScreen" class="practice-screen">
-    <button id="backToHomeBtn" class="back-btn">← Retour aux textes</button>
+    <button id="backToHomeBtn" class="back-btn">← Retour</button>
     <div class="card">
       <div id="textHeader" class="text-header"></div>
       
-      <div id="microStatus" class="micro-status">🎤 Touchez pour activer le micro</div>
-      <div id="mobileWarning" class="mobile-warning">📱 Sur iPhone, activez "Reconnaissance vocale" dans Réglages > Safari</div>
+      <div id="micStatus" class="mic-status">🎤 Appuyez sur "Parler" pour activer le micro</div>
       
       <div class="controls">
         <button id="playBtn">🔊 Écouter</button>
@@ -108,67 +94,61 @@
         <div class="sentence-text" id="sentenceText">Chargement...</div>
       </div>
 
-      <div id="permAlert" class="perm-alert">
-        <span>🎤 Microphone requis</span>
-        <button id="requestMicBtn" style="background:#f5a623; padding:6px 12px;">Activer</button>
-      </div>
-
       <div class="visualizer">
-        <canvas id="voiceCanvas" width="400" height="80"></canvas>
-        <div class="status" id="voiceStatus">🎤 Appuyez sur "Parler"</div>
+        <canvas id="voiceCanvas" width="400" height="60"></canvas>
+        <div class="status" id="voiceStatus">⚪ Prêt</div>
       </div>
 
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
       <div class="progress-stats">
-        <span>📊 Progression</span>
+        <span>Progression</span>
         <span id="progressText">0%</span>
       </div>
 
-      <div id="feedback" class="feedback feedback-info">💡 Appuyez sur "Parler" pour commencer</div>
+      <div id="feedback" class="feedback feedback-info">💡 Appuyez sur "Parler" puis répétez la phrase</div>
     </div>
   </div>
 </div>
 
 <script>
-  // ========== TEXTES SIMPLIFIÉS POUR MOBILE ==========
+  // ========== TEXTES COMPLETS (originaux) ==========
   const textsData = {
     entrepreneurship: {
       title: "ENTREPRENEURSHIP",
-      shortDesc: "Types d'entrepreneuriat",
-      fullText: `Entrepreneurship is the ability to develop and run a business. Small businesses include hairdressers, grocery stores, and carpenters. Scalable startups aim to change the world with innovative ideas. Large companies grow by offering new products. Social entrepreneurship focuses on solving society's problems.`
+      fullText: `Entrepreneurship is the ability and readiness to develop, organize and run a business enterprise, along with any of its uncertainties in order to make a profit. The most prominent example of entrepreneurship is the starting of new businesses. In economics, entrepreneurship connected with land, labour, natural resources and capital can generate a profit. The entrepreneurial vision is defined by discovery and risk-taking and is an indispensable part of a nation's capacity to succeed in an ever-changing and more competitive global marketplace. Entrepreneurship can be classified into small business, scalable startup, large company, and social entrepreneurship.`
     },
     fitness: {
-      title: "PHYSICAL FITNESS",
-      shortDesc: "Bienfaits de l'activité physique",
-      fullText: `Physical activity is important for everyone. It promotes good health and increases life expectancy. Regular exercise reduces the risk of heart disease and diabetes. Physical fitness improves muscle strength, bone density, and flexibility. An active lifestyle helps you live longer and healthier.`
+      title: "THE IMPORTANCE OF PHYSICAL FITNESS",
+      fullText: `Physical activity and exercise is important for everyone. Children, adolescents, and adults of all ages need regular physical activity. Physical activity promotes good health and you should stay active throughout all stages of your life. Regular physical activity increases life expectancy and reduces the risk of premature mortality. People who are more active tend to be healthier and tend to live longer. Regular exercise increases muscle strength, bone density, flexibility, and stability. Physical fitness can reduce your risk for accidental injuries, especially as you get older. A sedentary lifestyle can take a toll on a person's body. Exercise has been shown to improve mood and mental health.`
     },
-    malaria: {
-      title: "MALARIA",
-      shortDesc: "Causes et prévention du paludisme",
-      fullText: `Malaria is caused by a parasite transmitted by mosquito bites. Symptoms appear 9 to 30 days after infection. The disease can be mild or severe. Prevention includes using mosquito nets and repellents. Early treatment is essential to save lives.`
+    exports: {
+      title: "EXPORTS AND IMPORTS",
+      fullText: `Exports and imports play an important role in determining the overall health of an economy. Exports are goods and services a country sells to businesses or customers in a foreign country. Imports are goods and services a business or customer purchases from another country. Most countries try to export more than they import to increase domestic revenue. Exports and imports make up a country's balance of trade, which impacts an economy's overall health. A trade surplus occurs when exports are greater than imports. A trade deficit occurs when imports are greater than exports.`
     },
     ai: {
       title: "ARTIFICIAL INTELLIGENCE",
-      shortDesc: "L'impact de l'IA",
-      fullText: `Artificial intelligence is a rapidly growing technology. AI helps in medical diagnosis, autonomous cars, and virtual assistants. However, AI can also lead to job displacement. The ethical use of AI requires privacy protection and transparency.`
+      fullText: `Artificial intelligence is a rapidly evolving technology. It has the potential to transform society across all sectors of industries and governments. AI is a field of computer science focused on creating machines that perform tasks requiring human intelligence. AI has been used in medical diagnosis, autonomous cars, home automation, social media, chatbots, virtual assistance, and financial analysis. AI can increase economic growth through improved productivity. On the other hand, AI can lead to job displacement and increase economic inequality. The ethical implications of AI include issues of bias, privacy, security, and accountability.`
+    },
+    malaria: {
+      title: "MALARIA",
+      fullText: `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites that cause different symptoms. The symptoms of malaria appear 9 to 30 days after infection. For the most common species, the incubation period is usually 9 to 14 days. Malaria can be simple or complicated. Simple malaria manifests as a flu-like illness with fever, headache, chills, and muscle pain. Complicated malaria occurs when the parasite reaches a vital organ. Prevention is essential in the fight against malaria. It includes sanitation of wetlands, spraying mosquito repellents, and protecting homes with mosquito nets.`
     },
     deforestation: {
       title: "DEFORESTATION",
-      shortDesc: "Causes et conséquences",
-      fullText: `Deforestation is the destruction of forests for agriculture or urban use. About 31 percent of Earth's land is covered by forests. The main causes are agricultural expansion and logging. Deforestation leads to loss of biodiversity and climate change. Reforestation helps restore damaged forests.`
+      fullText: `Deforestation is the removal and destruction of a forest or stand of trees from land that is then converted to non-forest use. About 31 percent of Earth's land surface is covered by forests at present. The causes of deforestation are complex, often interwoven with economic, social, and political factors. One primary driver is agricultural expansion, where forests are cleared for crops and livestock. Another factor is logging, both legal and illegal. The timber industry provides jobs and resources, but unsustainable logging leads to severe ecological damage. Forests act as carbon sinks. When they are destroyed, carbon is released and the capacity for future carbon absorption is diminished. Reforestation involves planting trees in areas where forests have been cut down.`
     }
   };
 
-  function splitSentences(text, maxLen=90) {
+  // Découpage en phrases (max 100 caractères pour meilleure reconnaissance)
+  function splitIntoSentences(text, maxLen=100) {
     let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-    let segments = [];
+    let result = [];
     for (let s of sentences) {
-      s = s.trim().replace(/\s+/g, ' ');
-      if (s.length === 0) continue;
+      s = s.trim();
       if (s.length <= maxLen) {
-        segments.push(s);
+        result.push(s);
       } else {
         let words = s.split(' ');
         let current = '';
@@ -176,29 +156,27 @@
           if ((current + ' ' + w).length <= maxLen) {
             current = current ? current + ' ' + w : w;
           } else {
-            if (current) segments.push(current);
+            if (current) result.push(current + '.');
             current = w;
           }
         }
-        if (current) segments.push(current);
+        if (current) result.push(current + '.');
       }
     }
-    return segments;
+    return result;
   }
 
   let currentTextId = null;
-  let segments = [];
+  let sentences = [];
   let currentIndex = 0;
   let progress = [];
-  
-  let mediaStream = null;
-  let isRecording = false;
+  let isListening = false;
   let animationId = null;
   let recognition = null;
-  let isWaitingForNext = false;
-  let isMicrophoneReady = false;
+  let canvas = document.getElementById('voiceCanvas');
+  let ctx = canvas.getContext('2d');
 
-  // DOM
+  // Éléments DOM
   const homeScreen = document.getElementById('homeScreen');
   const practiceScreen = document.getElementById('practiceScreen');
   const textGrid = document.getElementById('textGrid');
@@ -209,53 +187,41 @@
   const repeatBtn = document.getElementById('repeatBtn');
   const nextBtn = document.getElementById('nextBtn');
   const resetBtn = document.getElementById('resetBtn');
-  const requestMicBtn = document.getElementById('requestMicBtn');
-  const permAlert = document.getElementById('permAlert');
   const voiceStatus = document.getElementById('voiceStatus');
   const feedbackDiv = document.getElementById('feedback');
   const progressFill = document.getElementById('progressFill');
   const progressText = document.getElementById('progressText');
-  const canvas = document.getElementById('voiceCanvas');
-  const ctx = canvas.getContext('2d');
-  const microStatusDiv = document.getElementById('microStatus');
-  const mobileWarning = document.getElementById('mobileWarning');
+  const micStatus = document.getElementById('micStatus');
 
   function resizeCanvas() {
-    canvas.width = Math.min(canvas.parentElement.clientWidth - 40, 400);
-    canvas.height = 80;
+    canvas.width = Math.min(canvas.parentElement.clientWidth - 30, 400);
+    canvas.height = 60;
   }
   window.addEventListener('resize', resizeCanvas);
-  
-  function getStorageKey() { return `mobile_progress_${currentTextId}`; }
+
+  // Progression
+  function getStorageKey() { return `voice_progress_${currentTextId}`; }
   
   function loadProgress() {
     let saved = localStorage.getItem(getStorageKey());
-    if (saved) {
-      progress = JSON.parse(saved);
-      if (progress.length > segments.length) progress = progress.slice(0, segments.length);
-      while (progress.length < segments.length) progress.push(false);
-    } else {
-      progress = new Array(segments.length).fill(false);
-    }
+    if (saved) progress = JSON.parse(saved);
+    else progress = new Array(sentences.length).fill(false);
+    while (progress.length < sentences.length) progress.push(false);
     currentIndex = 0;
-    updateProgressUI();
-    sentenceEl.innerText = segments[currentIndex];
-    updateNextButton();
+    updateUI();
   }
   
   function saveProgress() {
     localStorage.setItem(getStorageKey(), JSON.stringify(progress));
-    updateProgressUI();
+    updateUI();
   }
   
-  function updateProgressUI() {
+  function updateUI() {
     let done = progress.filter(v=>v===true).length;
-    let percent = Math.round((done/segments.length)*100);
+    let percent = Math.round((done/sentences.length)*100);
     progressFill.style.width = percent+'%';
-    progressText.innerText = `${done}/${segments.length} (${percent}%)`;
-  }
-  
-  function updateNextButton() {
+    progressText.innerText = `${done}/${sentences.length} (${percent}%)`;
+    sentenceEl.innerText = sentences[currentIndex];
     nextBtn.disabled = !progress[currentIndex];
     if (progress[currentIndex]) nextBtn.classList.add('success');
     else nextBtn.classList.remove('success');
@@ -265,207 +231,124 @@
     if (!progress[currentIndex]) {
       progress[currentIndex] = true;
       saveProgress();
-      updateNextButton();
       showFeedback(`✅ Phrase ${currentIndex+1} validée !`, 'success');
       return true;
     }
     return false;
   }
 
-  function showFeedback(msg, type='info', score=null) {
+  function showFeedback(msg, type='info') {
     let className = '';
     if (type === 'success') className = 'feedback-success';
     else if (type === 'error') className = 'feedback-error';
     else if (type === 'warning') className = 'feedback-warning';
     else className = 'feedback-info';
     
-    if (score !== null) {
-      feedbackDiv.innerHTML = `<div style="display:flex;align-items:center;"><div class="score-circle" style="background:${score>=70?'#27ae60':score>=50?'#f5a623':'#e74c3c'}">${score}%</div><div>${msg}</div></div>`;
-    } else {
-      feedbackDiv.innerHTML = msg;
-    }
+    feedbackDiv.innerHTML = msg;
     feedbackDiv.className = `feedback ${className}`;
     setTimeout(() => {
-      if (feedbackDiv.innerHTML === msg || feedbackDiv.innerHTML.includes(msg)) {
+      if (feedbackDiv.innerHTML === msg) {
         feedbackDiv.innerHTML = '💡 Appuyez sur "Parler" pour continuer';
         feedbackDiv.className = 'feedback feedback-info';
       }
     }, 4000);
   }
 
-  // Synthèse vocale mobile compatible
-  function speak(text, callback) {
+  // Lecture audio (nécessite une interaction utilisateur)
+  function speak(text, onEnd) {
     if (!window.speechSynthesis) {
-      showFeedback("❌ Synthèse vocale non disponible", "error");
+      showFeedback("Lecture non disponible sur ce navigateur", "error");
       return;
     }
-    let utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US';
-    utter.rate = 0.85;
-    utter.onend = () => { if(callback) callback(); };
+    let utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.85;
+    utterance.onend = () => { if(onEnd) onEnd(); };
     window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utter);
+    window.speechSynthesis.speak(utterance);
   }
 
   function playCurrent() {
-    speak(segments[currentIndex]);
-    showFeedback(`🔊 Écoute - ${currentIndex+1}/${segments.length}`, 'info');
+    speak(sentences[currentIndex]);
+    showFeedback(`🔊 Écoute - ${currentIndex+1}/${sentences.length}`, 'info');
   }
 
   function playBeep() {
     try {
-      let ctxBeep = new (window.AudioContext || window.webkitAudioContext)();
-      let osc = ctxBeep.createOscillator();
-      let gain = ctxBeep.createGain();
+      let ac = new (window.AudioContext || window.webkitAudioContext)();
+      let osc = ac.createOscillator();
+      let gain = ac.createGain();
       osc.connect(gain);
-      gain.connect(ctxBeep.destination);
+      gain.connect(ac.destination);
       osc.frequency.value = 880;
-      osc.type = 'sine';
-      gain.gain.value = 0.15;
+      gain.gain.value = 0.1;
       osc.start();
-      gain.gain.exponentialRampToValueAtTime(0.00001, ctxBeep.currentTime + 0.3);
-      osc.stop(ctxBeep.currentTime + 0.3);
-      setTimeout(() => ctxBeep.close(), 400);
+      gain.gain.exponentialRampToValueAtTime(0.00001, ac.currentTime + 0.3);
+      osc.stop(ac.currentTime + 0.3);
+      setTimeout(() => ac.close(), 400);
     } catch(e) {}
   }
 
-  // Initialisation microphone mobile
-  async function initMicrophone() {
-    if (isMicrophoneReady && mediaStream && mediaStream.active) {
-      microStatusDiv.innerHTML = '🎤 Microphone actif ✅';
-      microStatusDiv.className = 'micro-status';
-      return true;
-    }
-    
-    microStatusDiv.innerHTML = '🎤 Demande d\'accès...';
-    
-    try {
-      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(t => t.stop());
-      }
-      
-      mediaStream = stream;
-      isMicrophoneReady = true;
-      permAlert.classList.remove('show');
-      microStatusDiv.innerHTML = '🎤 Microphone actif ✅';
-      microStatusDiv.className = 'micro-status';
-      mobileWarning.classList.remove('show');
-      showFeedback('🎤 Microphone prêt ! Appuyez sur "Parler"', 'success');
-      return true;
-      
-    } catch(err) {
-      console.error(err);
-      isMicrophoneReady = false;
-      microStatusDiv.innerHTML = '🎤❌ Micro non autorisé';
-      microStatusDiv.className = 'micro-status error';
-      permAlert.classList.add('show');
-      
-      if (err.name === 'NotAllowedError') {
-        mobileWarning.classList.add('show');
-        showFeedback('❌ Autorisez le microphone dans les paramètres de votre navigateur', 'error');
-      }
-      return false;
-    }
-  }
-
-  // Visualisation simple pour mobile
+  // Animation de visualisation
   function startVisualization() {
     if (animationId) cancelAnimationFrame(animationId);
-    
-    let amplitude = 0;
-    let increasing = true;
-    
+    let time = 0;
     function draw() {
-      if (!isRecording) {
-        if (animationId) cancelAnimationFrame(animationId);
+      if (!isListening) {
         ctx.fillStyle = '#0f0f1a';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         return;
       }
-      
       ctx.fillStyle = '#0f0f1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      if (increasing) {
-        amplitude += 2;
-        if (amplitude >= 40) increasing = false;
-      } else {
-        amplitude -= 2;
-        if (amplitude <= 5) increasing = true;
-      }
-      
       ctx.beginPath();
       ctx.strokeStyle = '#0d6e6e';
-      ctx.lineWidth = 3;
-      
-      for (let x = 0; x < canvas.width; x += 4) {
-        let y = canvas.height/2 + Math.sin(x * 0.05 + Date.now() * 0.01) * amplitude;
+      ctx.lineWidth = 2;
+      for (let x = 0; x < canvas.width; x += 5) {
+        let y = canvas.height/2 + Math.sin(x * 0.03 + time) * 15;
         if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
-      
+      time += 0.1;
       animationId = requestAnimationFrame(draw);
     }
     draw();
   }
 
   function stopVisualization() {
-    isRecording = false;
+    isListening = false;
     if (animationId) cancelAnimationFrame(animationId);
     ctx.fillStyle = '#0f0f1a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Similarité simplifiée mais efficace
+  // Calcul de similarité
   function calculateSimilarity(spoken, target) {
     let a = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
     let b = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
-    
     if (a === b) return 1;
     if (a.length === 0 || b.length === 0) return 0;
-    
     let wordsA = a.split(/\s+/);
     let wordsB = b.split(/\s+/);
     let matches = 0;
-    
     for (let wa of wordsA) {
       for (let wb of wordsB) {
         if (wb === wa || wa.includes(wb) || wb.includes(wa) || 
-            (wa.length > 3 && wb.length > 3 && (wa.substring(0,3) === wb.substring(0,3)))) {
+            (wa.length > 4 && wb.length > 4 && wa[0] === wb[0] && wa[wa.length-1] === wb[wb.length-1])) {
           matches++;
           break;
         }
       }
     }
-    
-    let ratio = matches / Math.max(wordsA.length, wordsB.length);
-    return Math.min(ratio + 0.15, 1);
+    return matches / Math.max(wordsA.length, wordsB.length);
   }
 
-  // Reconnaissance vocale mobile
-  function startSpeechRecognition() {
-    if (!isMicrophoneReady) {
-      initMicrophone().then(success => {
-        if (success) startSpeechRecognitionInternal();
-        else showFeedback("🎤 Activez d'abord le microphone", "warning");
-      });
-      return;
-    }
-    startSpeechRecognitionInternal();
-  }
-  
-  function startSpeechRecognitionInternal() {
+  // Reconnaissance vocale
+  function startListening() {
     if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
-      showFeedback("📱 Sur iPhone, allez dans Réglages > Safari > Reconnaissance vocale", "warning");
-      mobileWarning.classList.add('show');
+      showFeedback("Reconnaissance vocale non supportée. Utilisez Chrome sur Android", "error");
       return;
-    }
-    
-    if (recognition) {
-      try { recognition.stop(); } catch(e) {}
     }
     
     const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -473,49 +356,44 @@
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-    recognition.continuous = false;
 
     recognition.onstart = () => {
-      isRecording = true;
-      voiceStatus.innerHTML = '🎤🔴 Parlez maintenant...';
+      isListening = true;
+      voiceStatus.innerHTML = '🎤🔴 Écoute... Parlez';
       voiceStatus.className = 'status listening';
       startVisualization();
+      micStatus.innerHTML = '🎤 Micro actif - Parlez maintenant';
+      micStatus.className = 'mic-status';
     };
 
     recognition.onresult = (event) => {
       let transcript = event.results[0][0].transcript;
-      evaluateSimilarityScore(transcript);
+      evaluate(transcript);
     };
 
     recognition.onerror = (event) => {
       if (event.error === 'not-allowed') {
-        isMicrophoneReady = false;
-        permAlert.classList.add('show');
-        showFeedback("❌ Autorisez le microphone", "error");
+        micStatus.innerHTML = '🎤❌ Micro non autorisé. Vérifiez les permissions';
+        micStatus.className = 'mic-status error';
+        showFeedback("Autorisez l'accès au microphone dans les paramètres", "error");
       } else if (event.error === 'no-speech') {
-        showFeedback("🎤 Aucun son détecté. Parlez plus fort", "warning");
-        voiceStatus.innerHTML = '🎤 Prêt';
-        voiceStatus.className = '';
-      } else if (event.error === 'audio-capture') {
-        showFeedback("🎤 Microphone non trouvé. Vérifiez vos permissions", "error");
+        showFeedback("Aucun son détecté. Parlez plus fort", "warning");
       } else {
-        showFeedback(`❌ ${event.error}. Réessayez`, "error");
+        showFeedback(`Erreur: ${event.error}. Réessayez`, "error");
       }
       stopListening();
     };
 
     recognition.onend = () => {
       stopListening();
-      if (!isWaitingForNext) {
-        voiceStatus.innerHTML = '🎤 Prêt';
-        voiceStatus.className = '';
-      }
+      voiceStatus.innerHTML = '⚪ Prêt';
+      voiceStatus.className = '';
     };
 
     try {
       recognition.start();
       setTimeout(() => {
-        if (recognition && isRecording) {
+        if (recognition && isListening) {
           try { recognition.stop(); } catch(e) {}
         }
       }, 8000);
@@ -525,75 +403,58 @@
   }
 
   function stopListening() {
-    isRecording = false;
+    isListening = false;
     stopVisualization();
+    if (recognition) {
+      try { recognition.stop(); } catch(e) {}
+    }
   }
 
-  function evaluateSimilarityScore(spoken) {
-    const target = segments[currentIndex];
-    const similarity = calculateSimilarity(spoken, target);
-    const percent = Math.round(similarity * 100);
+  function evaluate(spoken) {
+    const target = sentences[currentIndex];
+    const sim = calculateSimilarity(spoken, target);
+    const percent = Math.round(sim * 100);
     
     voiceStatus.innerHTML = `🎤✅ ${percent}%`;
-    voiceStatus.className = 'status success';
     
-    if (similarity >= 0.7) {
-      showFeedback(`Excellent ! ${percent}%`, 'success', percent);
+    if (sim >= 0.65) {
+      showFeedback(`✅ Excellent ! ${percent}% - "${spoken.substring(0, 50)}"`, 'success');
       const validated = markCurrentDone();
-      
-      if (validated && currentIndex + 1 < segments.length) {
+      if (validated && currentIndex + 1 < sentences.length) {
         setTimeout(() => {
           currentIndex++;
           saveProgress();
-          sentenceEl.innerText = segments[currentIndex];
-          updateNextButton();
-          showFeedback(`📖 Phrase ${currentIndex+1}/${segments.length}`, 'info');
+          updateUI();
+          showFeedback(`📖 Phrase ${currentIndex+1}/${sentences.length}`, 'info');
         }, 2000);
-      } else if (validated && currentIndex + 1 >= segments.length) {
-        setTimeout(() => showFeedback("🏆 Texte terminé !", "success"), 1500);
+      } else if (validated && currentIndex + 1 >= sentences.length) {
+        setTimeout(() => showFeedback("🏆 Félicitations ! Texte terminé !", "success"), 1500);
       }
-    } else if (similarity >= 0.5) {
-      showFeedback(`👍 ${percent}% - Encore un effort`, 'warning', percent);
+    } else if (sim >= 0.45) {
+      showFeedback(`👍 ${percent}% - "${spoken.substring(0, 50)}" → encore un effort`, 'warning');
     } else {
-      showFeedback(`📚 ${percent}% - Réécoutez et réessayez`, 'error', percent);
+      showFeedback(`📚 ${percent}% - Réécoutez et réessayez`, 'error');
     }
-    
-    setTimeout(() => {
-      if (voiceStatus.innerHTML.includes(percent)) {
-        voiceStatus.innerHTML = '🎤 Prêt';
-        voiceStatus.className = '';
-      }
-    }, 2500);
   }
 
-  async function fullRepeatSequence() {
-    if (isWaitingForNext) return;
-    isWaitingForNext = true;
-    
-    if (!isMicrophoneReady) {
-      let ok = await initMicrophone();
-      if (!ok) { isWaitingForNext = false; return; }
-    }
-    
-    showFeedback("🔊 Écoute...", "info");
-    speak(segments[currentIndex], () => {
+  function repeatSequence() {
+    showFeedback("🔊 Écoutez...", "info");
+    speak(sentences[currentIndex], () => {
       playBeep();
       showFeedback("🎤 Parlez maintenant", "warning");
       setTimeout(() => {
-        startSpeechRecognition();
-        setTimeout(() => { isWaitingForNext = false; }, 6000);
+        startListening();
       }, 300);
     });
   }
 
   function nextSegment() {
     if (progress[currentIndex]) {
-      if (currentIndex + 1 < segments.length) {
+      if (currentIndex + 1 < sentences.length) {
         currentIndex++;
         saveProgress();
-        sentenceEl.innerText = segments[currentIndex];
-        updateNextButton();
-        showFeedback(`📖 Phrase ${currentIndex+1}/${segments.length}`, 'info');
+        updateUI();
+        showFeedback(`📖 Phrase ${currentIndex+1}/${sentences.length}`, 'info');
       } else {
         showFeedback("🎉 Texte terminé !", "success");
       }
@@ -602,73 +463,51 @@
     }
   }
 
-  function resetAll() {
-    if (confirm("Réinitialiser toute progression ?")) {
-      progress = new Array(segments.length).fill(false);
+  function resetProgress() {
+    if (confirm("Réinitialiser la progression ?")) {
+      progress = new Array(sentences.length).fill(false);
       currentIndex = 0;
       saveProgress();
-      sentenceEl.innerText = segments[currentIndex];
-      updateNextButton();
+      updateUI();
       showFeedback("Progression réinitialisée", "info");
     }
   }
 
   function loadText(textId) {
     currentTextId = textId;
-    const textData = textsData[textId];
-    segments = splitSentences(textData.fullText, 90);
-    textHeader.innerHTML = `<h3>📖 ${textData.title}</h3>`;
+    const data = textsData[textId];
+    sentences = splitIntoSentences(data.fullText, 100);
+    textHeader.innerHTML = `<h3>📖 ${data.title}</h3>`;
     loadProgress();
     resizeCanvas();
     homeScreen.style.display = 'none';
     practiceScreen.style.display = 'block';
-    isWaitingForNext = false;
-    
-    if (recognition) {
-      try { recognition.stop(); } catch(e) {}
-    }
-    isRecording = false;
-    stopVisualization();
+    if (recognition) try { recognition.stop(); } catch(e) {}
   }
 
   function buildHomeScreen() {
     textGrid.innerHTML = '';
     for (let [id, data] of Object.entries(textsData)) {
-      const card = document.createElement('div');
+      let card = document.createElement('div');
       card.className = 'text-card';
-      card.innerHTML = `<h3>${data.title}</h3><p>${data.shortDesc}</p>`;
-      card.addEventListener('click', () => loadText(id));
+      card.innerHTML = `<h3>${data.title}</h3><p>Cliquez pour commencer</p>`;
+      card.onclick = () => loadText(id);
       textGrid.appendChild(card);
     }
   }
 
   // Événements
-  playBtn.addEventListener('click', playCurrent);
-  repeatBtn.addEventListener('click', fullRepeatSequence);
-  nextBtn.addEventListener('click', nextSegment);
-  resetBtn.addEventListener('click', resetAll);
-  requestMicBtn.addEventListener('click', () => initMicrophone());
-  backToHomeBtn.addEventListener('click', () => {
+  playBtn.onclick = playCurrent;
+  repeatBtn.onclick = repeatSequence;
+  nextBtn.onclick = nextSegment;
+  resetBtn.onclick = resetProgress;
+  backToHomeBtn.onclick = () => {
     homeScreen.style.display = 'block';
     practiceScreen.style.display = 'none';
-    isWaitingForNext = false;
-  });
-
-  // Détection iOS pour afficher un message
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  if (isIOS) {
-    mobileWarning.classList.add('show');
-    mobileWarning.innerHTML = '📱 Sur iPhone : Réglages > Safari > Microphone > Autoriser';
-  }
+  };
 
   buildHomeScreen();
   resizeCanvas();
-  
-  // Demander le micro au premier touch (requis pour iOS)
-  document.body.addEventListener('touchstart', function initMicroOnTouch() {
-    initMicrophone().catch(() => {});
-    document.body.removeEventListener('touchstart', initMicroOnTouch);
-  }, { once: true });
 </script>
 </body>
 </html>
