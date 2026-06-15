@@ -2,117 +2,222 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Malaria - Prononciation avec validation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>AI Voice Coach - English Pronunciation Trainer</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto;background:#eef5f2;padding:20px;}
-  .container{max-width:900px;margin:0 auto;}
-  .header{background:#0d6e6e;color:white;padding:20px 25px;border-radius:28px;margin-bottom:20px;}
+  body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto;background:linear-gradient(135deg, #eef5f2 0%, #d4e4df 100%);padding:20px;min-height:100vh;}
+  .container{max-width:1000px;margin:0 auto;}
+  
+  .header{background:linear-gradient(135deg, #0d6e6e, #0a5555);color:white;padding:20px 25px;border-radius:28px;margin-bottom:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
   .header h1{font-size:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
   .badge{background:rgba(255,255,255,0.2);padding:5px 12px;border-radius:40px;font-size:0.8rem;}
-  .card{background:white;border-radius:24px;padding:24px;margin-bottom:20px;box-shadow:0 8px 20px rgba(0,0,0,0.05);}
-  .sentence-box{background:#e6f4f1;border-left:5px solid #0d6e6e;padding:20px;border-radius:18px;margin-bottom:20px;}
-  .sentence-text{font-size:1.3rem;font-weight:500;line-height:1.4;}
-  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
-  button{background:#0d6e6e;border:none;padding:10px 18px;border-radius:40px;color:white;font-weight:600;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:6px;}
-  button:hover{background:#0a5555;transform:translateY(-2px);}
+  
+  .home-screen{background:white;border-radius:28px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.1);}
+  .home-screen h2{color:#0d6e6e;margin-bottom:20px;text-align:center;}
+  .text-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin-top:20px;}
+  .text-card{background:#f8fafc;border:2px solid #e2e8f0;border-radius:20px;padding:18px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);}
+  .text-card:hover{transform:translateY(-5px);border-color:#0d6e6e;background:#e6f4f1;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+  .text-card h3{color:#0d6e6e;margin-bottom:8px;font-size:1.1rem;}
+  .text-card p{font-size:0.85rem;color:#64748b;}
+  
+  .practice-screen{display:none;}
+  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:15px;}
+  .back-btn:hover{background:#cbd5e1;transform:translateY(-2px);}
+  
+  .card{background:white;border-radius:28px;padding:24px;margin-bottom:20px;box-shadow:0 20px 40px rgba(0,0,0,0.1);}
+  .text-header{color:#0d6e6e;margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid #e2e8f0;}
+  .sentence-box{background:linear-gradient(135deg, #e6f4f1, #d0ebe6);border-left:5px solid #0d6e6e;padding:25px;border-radius:18px;margin-bottom:20px;}
+  .sentence-text{font-size:1.25rem;font-weight:500;line-height:1.5;color:#1a2e2a;}
+  .controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;justify-content:center;}
+  button{background:#0d6e6e;border:none;padding:12px 24px;border-radius:60px;color:white;font-weight:600;cursor:pointer;transition:all 0.2s ease;display:inline-flex;align-items:center;gap:8px;font-size:0.95rem;}
+  button:hover{background:#0a5555;transform:translateY(-2px);box-shadow:0 5px 15px rgba(13,110,110,0.3);}
   button.outline{background:transparent;border:2px solid #0d6e6e;color:#0d6e6e;}
+  button.outline:hover{background:#e6f4f1;}
   button.danger{background:#e74c3c;}
   button.danger:hover{background:#c0392b;}
   button.success{background:#27ae60;}
-  button.success:hover{background:#219a52;}
-  button:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+  button:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+  
+  /* Visualiseur avancé */
   .visualizer{background:#1a1a2e;border-radius:24px;padding:20px;margin:20px 0;text-align:center;}
-  canvas{width:100%;height:100px;background:#0f0f1a;border-radius:20px;display:block;}
-  .status{margin-top:12px;font-weight:600;}
+  canvas{width:100%;height:120px;background:#0f0f1a;border-radius:20px;display:block;}
+  .status{margin-top:12px;font-weight:600;font-size:1rem;}
   .status.listening{color:#e74c3c;animation:pulse 1s infinite;}
   .status.success{color:#27ae60;}
+  .status.processing{color:#f5a623;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
-  .progress-bar{height:10px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:15px 0;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623);width:0%;transition:width 0.3s;}
-  .progress-stats{display:flex;justify-content:space-between;font-size:0.85rem;margin-top:5px;}
-  .feedback{margin-top:15px;padding:12px;border-radius:16px;background:#f8f9fa;border-left:4px solid #0d6e6e;transition:all 0.3s;}
-  .feedback-success{background:#d4edda;border-left-color:#27ae60;color:#155724;}
-  .feedback-error{background:#f8d7da;border-left-color:#e74c3c;color:#721c24;}
-  .feedback-warning{background:#fff3cd;border-left-color:#f5a623;color:#856404;}
-  .feedback-info{background:#d1ecf1;border-left-color:#0d6e6e;color:#0c5460;}
-  .perm-alert{background:#fff3cd;border-radius:16px;padding:12px;margin-bottom:15px;display:none;}
+  
+  .progress-bar{height:12px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:15px 0;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623,#27ae60);width:0%;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);}
+  .progress-stats{display:flex;justify-content:space-between;font-size:0.85rem;margin-top:8px;}
+  
+  .feedback{margin-top:15px;padding:16px;border-radius:20px;transition:all 0.3s;}
+  .feedback-success{background:linear-gradient(135deg,#d4edda,#c8e6d9);border-left:5px solid #27ae60;color:#155724;}
+  .feedback-error{background:linear-gradient(135deg,#f8d7da,#ffebee);border-left:5px solid #e74c3c;color:#721c24;}
+  .feedback-warning{background:linear-gradient(135deg,#fff3cd,#ffeaa7);border-left:5px solid #f5a623;color:#856404;}
+  .feedback-info{background:linear-gradient(135deg,#d1ecf1,#bee0eb);border-left:5px solid #0d6e6e;color:#0c5460;}
+  
+  .score-circle{display:inline-block;width:60px;height:60px;border-radius:50%;background:#1a1a2e;color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;margin-right:15px;}
+  
+  .word-highlight{background:#f5a623;color:white;padding:2px 6px;border-radius:12px;font-size:0.8rem;margin-left:8px;}
+  
+  .perm-alert{background:#fff3cd;border-radius:20px;padding:12px;margin-bottom:15px;display:none;}
   .perm-alert.show{display:flex;justify-content:space-between;align-items:center;}
-  @media(max-width:600px){.sentence-text{font-size:1rem;}}
+  
+  @media(max-width:600px){.sentence-text{font-size:1rem;}.controls button{padding:8px 16px;font-size:0.85rem;}}
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>🦟 Malaria — Prononciation <span class="badge">Terminale</span></h1>
-    <p>Écoute, répète après le bip, valide ta prononciation</p>
+    <h1>🎤 AI Voice Coach <span class="badge">Advanced Pronunciation</span></h1>
+    <p>Écoute, répète, l'IA analyse et corrige ta prononciation en temps réel</p>
   </div>
 
-  <div class="card">
-    <div class="controls">
-      <button id="playBtn">🔊 Écouter</button>
-      <button id="repeatBtn" style="background:#f5a623;">🎤 Répéter (bip → parle)</button>
-      <button id="nextBtn" class="outline" disabled>⏩ Suivant</button>
-      <button id="resetBtn" class="danger">🔄 Reset</button>
-    </div>
+  <div id="homeScreen" class="home-screen">
+    <h2>📚 Choisissez un texte</h2>
+    <div class="text-grid" id="textGrid"></div>
+  </div>
 
-    <div class="sentence-box">
-      <div class="sentence-text" id="sentenceText">Chargement...</div>
-    </div>
+  <div id="practiceScreen" class="practice-screen">
+    <button id="backToHomeBtn" class="back-btn">← Retour aux textes</button>
+    <div class="card">
+      <div id="textHeader" class="text-header"></div>
+      <div class="controls">
+        <button id="playBtn">🔊 Écouter</button>
+        <button id="repeatBtn" style="background:#f5a623;">🎤 IA Écoute & Analyse</button>
+        <button id="nextBtn" class="outline" disabled>⏩ Suivant</button>
+        <button id="resetBtn" class="danger">🔄 Reset</button>
+      </div>
 
-    <div id="permAlert" class="perm-alert">
-      <span>🎤 Autorisez le microphone pour la reconnaissance vocale</span>
-      <button id="requestMicBtn" style="background:#f5a623; padding:6px 12px;">Autoriser</button>
-    </div>
+      <div class="sentence-box">
+        <div class="sentence-text" id="sentenceText">Chargement...</div>
+      </div>
 
-    <div class="visualizer">
-      <canvas id="voiceCanvas" width="800" height="100"></canvas>
-      <div class="status" id="voiceStatus">🎤 En attente</div>
-    </div>
+      <div id="permAlert" class="perm-alert">
+        <span>🎤 Autorisez le microphone pour l'analyse IA</span>
+        <button id="requestMicBtn" style="background:#f5a623; padding:6px 12px;">Autoriser</button>
+      </div>
 
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-    <div class="progress-stats">
-      <span>📊 Progression</span>
-      <span id="progressText">0%</span>
-    </div>
+      <div class="visualizer">
+        <canvas id="voiceCanvas" width="800" height="120"></canvas>
+        <div class="status" id="voiceStatus">🎤 En attente</div>
+      </div>
 
-    <div id="feedback" class="feedback feedback-info">💡 Cliquez sur "Répéter" pour démarrer</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-stats">
+        <span>📊 Progression</span>
+        <span id="progressText">0%</span>
+      </div>
+
+      <div id="feedback" class="feedback feedback-info">💡 Cliquez sur "IA Écoute & Analyse" pour commencer</div>
+    </div>
   </div>
 </div>
 
 <script>
-  // ========== TEXTE COMPLET ==========
-  const fullText = `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites : they vary according to the geographical area affected and cause different symptoms : plasmodium falciparum, plasmodium vivax, plasmodium ovale, plasmodium malariae , plasmodium knowlesi.
-The symptoms of malaria remain undetectable for the first few days after the bite. The first signs appear 9 to 30 days after the infection, depending on the species of Plasmodium involved. For the most common species (Plasmodium Falciparum), the incubation period is usually 9 to 14 days.
-Malaria disease and associated symptoms can be classified as "simple" or "complicated". The disease is said to be simple when it manifests as a flu-like illness. The patient suffers from fever, headache, chills and muscles pain. And it is complicated or severe when the parasite reaches a vital organ. This form can appear in the case of infection by plasmodium falciparum and plasmodium vivax. The high number of deaths is mainly due to delayed or inadequate treatment. Prevention is essential in the fight against malaria in Africa.`;
+  // ========== TEXTES ==========
+  const textsData = {
+    entrepreneurship: {
+      title: "ENTREPRENEURSHIP",
+      shortDesc: "Types d'entrepreneuriat : small business, scalable startup, large company, social",
+      fullText: `Entrepreneurship is the ability and readiness to develop, organize and run a business enterprise, along with any of its uncertainties in order to make a profit. The most prominent example of entrepreneurship is the starting of new businesses.
+In economics, entrepreneurship connected with land, labour, natural resources and capital can generate a profit. The entrepreneurial vision is defined by discovery and risk-taking.
+Small Business Entrepreneurship: These businesses are a hairdresser, grocery store, travel agent, consultant, carpenter, plumber, electrician, etc. They run their own business and hire family members or local employees.
+Scalable Startup Entrepreneurship: It starts a business knowing that their vision can change the world. They attract investors who encourage people who think out of the box.
+Large Company Entrepreneurship: These huge companies grow and sustain by offering new and innovative products that revolve around their main products.
+Social Entrepreneurship: This type focuses on producing products and services that resolve social needs and problems. Their goal is to work for society and not make profits.`
+    },
+    fitness: {
+      title: "THE IMPORTANCE OF PHYSICAL FITNESS",
+      shortDesc: "Bienfaits de l'activité physique",
+      fullText: `Physical activity and exercise is important for everyone. Children, adolescents, and adults of all ages need regular physical activity. Physical activity promotes good health and you should stay active throughout all stages of your life.
+Regular physical activity increases life expectancy and reduces the risk of premature mortality. People who are more active tend to be healthier and tend to live longer.
+Regular exercise increases muscle strength, bone density, flexibility, and stability. Physical fitness can reduce your risk for accidental injuries, especially as you get older.
+A sedentary lifestyle can take a toll on a person's body. Exercise has been shown to improve mood and mental health, and provides numerous health benefits.`
+    },
+    exports: {
+      title: "EXPORTS AND IMPORTS",
+      shortDesc: "Rôle des exportations et importations",
+      fullText: `Exports and imports play an important role in determining the overall health of an economy. Exports are goods and services a country sells to businesses or customers in a foreign country.
+Imports are goods and services a business or customer purchases from another country. Most countries try to export more than they import to increase domestic revenue.
+Exports and imports make up a country's balance of trade, which impacts an economy's overall health. A trade surplus occurs when exports are greater than imports. A trade deficit occurs when imports are greater than exports.`
+    },
+    ai: {
+      title: "ARTIFICIAL INTELLIGENCE",
+      shortDesc: "L'impact global de l'IA",
+      fullText: `Artificial intelligence is a rapidly evolving technology. It has the potential to transform society across all sectors of industries and governments. AI is a field of computer science focused on creating machines that perform tasks requiring human intelligence.
+AI has been used in medical diagnosis, autonomous cars, home automation, social media, chatbots, virtual assistance, and financial analysis. AI can increase economic growth through improved productivity.
+On the other hand, AI can lead to job displacement and increase economic inequality. The ethical implications of AI include issues of bias, privacy, security, and accountability.`
+    },
+    malaria: {
+      title: "MALARIA",
+      shortDesc: "Causes, symptômes et prévention du paludisme",
+      fullText: `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites that cause different symptoms.
+The symptoms of malaria appear 9 to 30 days after infection. For the most common species, the incubation period is usually 9 to 14 days.
+Malaria can be simple or complicated. Simple malaria manifests as a flu-like illness with fever, headache, chills, and muscle pain. Complicated malaria occurs when the parasite reaches a vital organ.
+Prevention is essential in the fight against malaria. It includes sanitation of wetlands, spraying mosquito repellents, and protecting homes with mosquito nets.`
+    },
+    deforestation: {
+      title: "DEFORESTATION",
+      shortDesc: "Causes et conséquences de la déforestation",
+      fullText: `Deforestation is the removal and destruction of a forest or stand of trees from land that is then converted to non-forest use. About 31 percent of Earth's land surface is covered by forests at present.
+The causes of deforestation are complex, often interwoven with economic, social, and political factors. One primary driver is agricultural expansion, where forests are cleared for crops and livestock.
+Another factor is logging, both legal and illegal. The timber industry provides jobs and resources, but unsustainable logging leads to severe ecological damage.
+Forests act as carbon sinks. When they are destroyed, carbon is released and the capacity for future carbon absorption is diminished. Reforestation involves planting trees in areas where forests have been cut down.`
+    }
+  };
 
-  // ========== Découpage en segments ==========
-  function splitSentences(text, maxLen=110) {
+  // ========== Découpage intelligent ==========
+  function splitSentences(text, maxLen=100) {
     let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
     let segments = [];
     for (let s of sentences) {
-      s = s.trim();
-      if (s.length <= maxLen) segments.push(s);
-      else {
-        let words = s.split(' ');
+      s = s.trim().replace(/\s+/g, ' ');
+      if (s.length === 0) continue;
+      if (s.length <= maxLen) {
+        segments.push(s);
+      } else {
+        let parts = s.split(/[,;:]/);
         let current = '';
-        for (let w of words) {
-          if ((current + ' ' + w).length <= maxLen) current = current ? current + ' ' + w : w;
-          else { if(current) segments.push(current); current = w; }
+        for (let part of parts) {
+          part = part.trim();
+          if (current.length + part.length + 2 <= maxLen) {
+            current = current ? current + ', ' + part : part;
+          } else {
+            if (current) segments.push(current + '.');
+            current = part;
+          }
         }
-        if(current) segments.push(current);
+        if (current) segments.push(current + '.');
       }
     }
     return segments;
   }
-  const segments = splitSentences(fullText, 110);
-  let currentIndex = 0;
-  let progress = new Array(segments.length).fill(false);
 
-  // DOM elements
+  let currentTextId = null;
+  let segments = [];
+  let currentIndex = 0;
+  let progress = [];
+  
+  // Audio variables
+  let mediaStream = null;
+  let audioContext = null;
+  let analyser = null;
+  let animationId = null;
+  let isRecording = false;
+  let recognition = null;
+  let isWaitingForNext = false;
+
+  // DOM
+  const homeScreen = document.getElementById('homeScreen');
+  const practiceScreen = document.getElementById('practiceScreen');
+  const textGrid = document.getElementById('textGrid');
+  const backToHomeBtn = document.getElementById('backToHomeBtn');
+  const textHeader = document.getElementById('textHeader');
   const sentenceEl = document.getElementById('sentenceText');
   const playBtn = document.getElementById('playBtn');
   const repeatBtn = document.getElementById('repeatBtn');
@@ -127,37 +232,34 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
   const canvas = document.getElementById('voiceCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Variables audio
-  let mediaStream = null;
-  let audioContext = null;
-  let analyser = null;
-  let animationId = null;
-  let isRecording = false;
-  let recognition = null;
-  let isWaitingForNext = false; // Empêcher les doublons
-
-  // Redimension canvas
   function resizeCanvas() {
-    canvas.width = canvas.parentElement.clientWidth - 40;
-    canvas.height = 100;
+    if (canvas.parentElement) {
+      canvas.width = canvas.parentElement.clientWidth - 40;
+      canvas.height = 120;
+    }
   }
   window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  // ========== Progression ==========
+  
+  // Progression
+  function getStorageKey() { return `pronunciation_progress_${currentTextId}`; }
+  
   function loadProgress() {
-    let saved = localStorage.getItem('malaria_prog');
-    let savedIdx = localStorage.getItem('malaria_idx');
-    if (saved) progress = JSON.parse(saved);
-    if (savedIdx && parseInt(savedIdx) < segments.length) currentIndex = parseInt(savedIdx);
+    let saved = localStorage.getItem(getStorageKey());
+    if (saved) {
+      progress = JSON.parse(saved);
+      if (progress.length > segments.length) progress = progress.slice(0, segments.length);
+      while (progress.length < segments.length) progress.push(false);
+    } else {
+      progress = new Array(segments.length).fill(false);
+    }
+    currentIndex = 0;
     updateProgressUI();
     sentenceEl.innerText = segments[currentIndex];
     updateNextButton();
   }
   
   function saveProgress() {
-    localStorage.setItem('malaria_prog', JSON.stringify(progress));
-    localStorage.setItem('malaria_idx', currentIndex);
+    localStorage.setItem(getStorageKey(), JSON.stringify(progress));
     updateProgressUI();
   }
   
@@ -169,15 +271,9 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
   }
   
   function updateNextButton() {
-    // Activer le bouton Suivant seulement si la phrase courante est validée
     nextBtn.disabled = !progress[currentIndex];
-    if (progress[currentIndex]) {
-      nextBtn.classList.add('success');
-      nextBtn.style.background = '#27ae60';
-    } else {
-      nextBtn.classList.remove('success');
-      nextBtn.style.background = '';
-    }
+    if (progress[currentIndex]) nextBtn.classList.add('success');
+    else nextBtn.classList.remove('success');
   }
   
   function markCurrentDone() {
@@ -185,35 +281,40 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       progress[currentIndex] = true;
       saveProgress();
       updateNextButton();
-      showFeedback(`✅ Félicitations ! Segment ${currentIndex+1} validé !`, 'success');
+      showFeedback(`✅ Parfait ! Phrase ${currentIndex+1} validée !`, 'success');
       return true;
     }
     return false;
   }
 
-  function showFeedback(msg, type='info') {
+  function showFeedback(msg, type='info', score=null) {
     let className = '';
     if (type === 'success') className = 'feedback-success';
     else if (type === 'error') className = 'feedback-error';
     else if (type === 'warning') className = 'feedback-warning';
     else className = 'feedback-info';
     
-    feedbackDiv.innerHTML = msg;
+    if (score !== null) {
+      feedbackDiv.innerHTML = `<div style="display:flex;align-items:center;"><div class="score-circle" style="background:${score>=70?'#27ae60':score>=50?'#f5a623':'#e74c3c'}">${score}%</div><div>${msg}</div></div>`;
+    } else {
+      feedbackDiv.innerHTML = msg;
+    }
     feedbackDiv.className = `feedback ${className}`;
     setTimeout(() => {
-      if (feedbackDiv.innerHTML === msg) {
-        feedbackDiv.innerHTML = '💡 Cliquez sur "Répéter" pour continuer';
+      if (feedbackDiv.innerHTML === msg || feedbackDiv.innerHTML.includes(msg)) {
+        feedbackDiv.innerHTML = '💡 Cliquez sur "IA Écoute & Analyse" pour continuer';
         feedbackDiv.className = 'feedback feedback-info';
       }
-    }, 4000);
+    }, 5000);
   }
 
-  // ========== Synthèse vocale ==========
+  // Synthèse vocale
   function speak(text, callback) {
     if (!window.speechSynthesis) return;
     let utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
     utter.rate = 0.85;
+    utter.pitch = 1;
     utter.onend = () => { if(callback) callback(); };
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utter);
@@ -221,10 +322,9 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
 
   function playCurrent() {
     speak(segments[currentIndex]);
-    showFeedback(`🔊 Écoute du segment ${currentIndex+1}/${segments.length}`, 'info');
+    showFeedback(`🔊 Écoute - Phrase ${currentIndex+1}/${segments.length}`, 'info');
   }
 
-  // ========== Bip sonore ==========
   function playBeep() {
     try {
       let ctxBeep = new (window.AudioContext || window.webkitAudioContext)();
@@ -234,19 +334,17 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       gain.connect(ctxBeep.destination);
       osc.frequency.value = 880;
       osc.type = 'sine';
-      gain.gain.value = 0.2;
+      gain.gain.value = 0.25;
       osc.start();
       gain.gain.exponentialRampToValueAtTime(0.00001, ctxBeep.currentTime + 0.4);
       osc.stop(ctxBeep.currentTime + 0.4);
       setTimeout(() => ctxBeep.close(), 500);
-    } catch(e) { console.log('beep error'); }
+    } catch(e) {}
   }
 
-  // ========== Visualisation microphone ==========
+  // Microphone
   async function initMicrophone() {
-    if (mediaStream) {
-      mediaStream.getTracks().forEach(t => t.stop());
-    }
+    if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
     if (audioContext) await audioContext.close();
     try {
       let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -258,21 +356,22 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       source.connect(analyser);
       await audioContext.resume();
       permAlert.classList.remove('show');
-      showFeedback('🎤 Microphone prêt !', 'success');
       return true;
     } catch(err) {
-      console.error(err);
       permAlert.classList.add('show');
-      showFeedback('❌ Microphone non autorisé. Cliquez sur "Autoriser"', 'error');
+      showFeedback('❌ Activez le microphone dans les paramètres', 'error');
       return false;
     }
   }
 
+  // Visualisation avancée avec analyse d'amplitude
   function startVisualization() {
     if (animationId) cancelAnimationFrame(animationId);
     if (!analyser) return;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
+    let lastAmplitude = 0;
+    
     function draw() {
       if (!isRecording || !analyser) {
         if (animationId) cancelAnimationFrame(animationId);
@@ -281,18 +380,22 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       analyser.getByteTimeDomainData(dataArray);
       ctx.fillStyle = '#0f0f1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
       let sliceWidth = canvas.width / bufferLength;
       let x = 0;
       ctx.beginPath();
-      ctx.strokeStyle = '#0d6e6e';
-      ctx.lineWidth = 3;
+      let maxAmp = 0;
       for (let i = 0; i < bufferLength; i++) {
         let v = dataArray[i] / 128.0;
+        let amplitude = Math.abs(v - 1);
+        if (amplitude > maxAmp) maxAmp = amplitude;
         let y = (v * canvas.height) / 2;
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
         x += sliceWidth;
       }
+      ctx.strokeStyle = maxAmp > 0.15 ? '#e74c3c' : maxAmp > 0.05 ? '#f5a623' : '#0d6e6e';
+      ctx.lineWidth = 3;
       ctx.stroke();
       animationId = requestAnimationFrame(draw);
     }
@@ -306,35 +409,125 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // ========== Reconnaissance vocale ==========
+  // ========== ALGORITHME DE SIMILARITÉ AVANCÉ ==========
+  function advancedSimilarity(spoken, target) {
+    let spokenNorm = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    let targetNorm = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    
+    if (spokenNorm === targetNorm) return 1;
+    if (spokenNorm.length === 0 || targetNorm.length === 0) return 0;
+    
+    let spokenWords = spokenNorm.split(/\s+/);
+    let targetWords = targetNorm.split(/\s+/);
+    
+    // Calcul du score par mot avec pondération
+    let totalScore = 0;
+    let maxPossible = targetWords.length;
+    
+    for (let i = 0; i < targetWords.length; i++) {
+      let targetWord = targetWords[i];
+      let bestMatch = 0;
+      
+      for (let j = 0; j < spokenWords.length; j++) {
+        let spokenWord = spokenWords[j];
+        
+        // Exact match
+        if (spokenWord === targetWord) {
+          bestMatch = 1;
+          break;
+        }
+        // Contains or starts with
+        if (spokenWord.includes(targetWord) || targetWord.includes(spokenWord)) {
+          bestMatch = Math.max(bestMatch, 0.85);
+        }
+        // Levenshtein pour mots similaires
+        else {
+          let len = Math.max(spokenWord.length, targetWord.length);
+          let dist = levenshteinDistance(spokenWord, targetWord);
+          let sim = 1 - (dist / len);
+          bestMatch = Math.max(bestMatch, sim * 0.8);
+        }
+      }
+      totalScore += bestMatch;
+    }
+    
+    // Bonus pour l'ordre approximatif des mots
+    let orderBonus = 0;
+    for (let i = 0; i < Math.min(spokenWords.length, targetWords.length); i++) {
+      if (spokenWords[i] === targetWords[i]) orderBonus += 0.05;
+    }
+    
+    let finalScore = (totalScore / maxPossible) + Math.min(orderBonus, 0.2);
+    return Math.min(finalScore, 1);
+  }
+  
+  function levenshteinDistance(a, b) {
+    const matrix = Array(b.length + 1).fill().map(() => Array(a.length + 1).fill(0));
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+    for (let j = 1; j <= b.length; j++) {
+      for (let i = 1; i <= a.length; i++) {
+        const cost = a[i-1] === b[j-1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i-1] + 1,
+          matrix[j-1][i] + 1,
+          matrix[j-1][i-1] + cost
+        );
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+
+  // Reconnaissance vocale avancée
   function startSpeechRecognition() {
     if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
-      showFeedback("❌ Reconnaissance vocale non supportée (utilisez Chrome/Edge)", "error");
+      showFeedback("❌ Utilisez Chrome ou Edge pour la reconnaissance vocale", "error");
       return false;
     }
     const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecog();
     recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 3;
+    recognition.continuous = false;
 
     recognition.onstart = () => {
       isRecording = true;
-      voiceStatus.innerHTML = '🎤🔴 Écoute en cours... Parlez';
+      voiceStatus.innerHTML = '🎤🔴 IA en écoute... Parlez clairement';
       voiceStatus.className = 'status listening';
       startVisualization();
     };
 
     recognition.onresult = (event) => {
-      let transcript = event.results[0][0].transcript;
-      evaluateSimilarity(transcript);
+      let bestTranscript = '';
+      let bestConfidence = 0;
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          for (let j = 0; j < event.results[i].length; j++) {
+            if (event.results[i][j].confidence > bestConfidence) {
+              bestConfidence = event.results[i][j].confidence;
+              bestTranscript = event.results[i][j].transcript;
+            }
+          }
+        }
+      }
+      
+      if (bestTranscript) {
+        evaluateAdvanced(bestTranscript);
+      } else if (event.results[0][0]) {
+        evaluateAdvanced(event.results[0][0].transcript);
+      }
     };
 
     recognition.onerror = (event) => {
-      console.error(event.error);
       if (event.error === 'not-allowed') {
         permAlert.classList.add('show');
-        showFeedback("❌ Permission microphone refusée", "error");
+        showFeedback("❌ Autorisez le microphone", "error");
+      } else if (event.error === 'no-speech') {
+        showFeedback("🎤 Aucun son détecté. Parlez plus fort", "warning");
+        voiceStatus.innerHTML = '🎤 En attente';
+        voiceStatus.className = '';
       } else {
         showFeedback(`❌ Erreur: ${event.error}. Réessayez`, "error");
       }
@@ -343,8 +536,10 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
 
     recognition.onend = () => {
       stopListening();
-      voiceStatus.innerHTML = '🎤 Prêt';
-      voiceStatus.className = '';
+      if (!isWaitingForNext) {
+        voiceStatus.innerHTML = '🎤 Prêt';
+        voiceStatus.className = '';
+      }
     };
 
     try {
@@ -364,86 +559,74 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
     stopVisualization();
   }
 
-  function evaluateSimilarity(spoken) {
+  function evaluateAdvanced(spoken) {
     const target = segments[currentIndex];
-    const sim = calculateSimilarity(spoken, target);
-    const percent = Math.round(sim * 100);
-    voiceStatus.innerHTML = `🎤✅ ${percent}% de correspondance`;
+    const similarity = advancedSimilarity(spoken, target);
+    const percent = Math.round(similarity * 100);
+    
+    voiceStatus.innerHTML = `🎤✅ Analyse: ${percent}% de correspondance`;
     voiceStatus.className = 'status success';
-
-    if (sim >= 0.65) {
-      showFeedback(`✅ Excellent ! (${percent}%) - "${spoken}"`, 'success');
-      const wasValidated = markCurrentDone();
+    
+    let message = '';
+    let type = '';
+    
+    if (similarity >= 0.78) {
+      message = `Excellent ! ${percent}% - Prononciation très proche du modèle`;
+      type = 'success';
+      const validated = markCurrentDone();
       
-      // Passage automatique à la phrase suivante après validation
-      if (wasValidated && currentIndex + 1 < segments.length) {
+      if (validated && currentIndex + 1 < segments.length) {
         setTimeout(() => {
           currentIndex++;
           saveProgress();
           sentenceEl.innerText = segments[currentIndex];
           updateNextButton();
-          showFeedback(`📖 Passons au segment ${currentIndex+1}/${segments.length}`, 'info');
-          // Auto-play de la nouvelle phrase ?
+          showFeedback(`📖 Phrase ${currentIndex+1}/${segments.length}`, 'info');
         }, 2000);
-      } else if (wasValidated && currentIndex + 1 >= segments.length) {
-        setTimeout(() => {
-          showFeedback("🏆 Félicitations ! Vous avez terminé tout le texte !", "success");
-        }, 1500);
+      } else if (validated && currentIndex + 1 >= segments.length) {
+        setTimeout(() => showFeedback("🏆 Félicitations ! Texte terminé !", "success"), 1500);
       }
-    } else if (sim >= 0.45) {
-      showFeedback(`👍 ${percent}% - "${spoken}" → encore un effort`, 'warning');
+    } else if (similarity >= 0.6) {
+      message = `Bon travail ! ${percent}% - Quelques mots à améliorer, réessayez`;
+      type = 'warning';
+    } else if (similarity >= 0.4) {
+      message = `👍 ${percent}% - Écoutez bien et répétez plus lentement`;
+      type = 'warning';
     } else {
-      showFeedback(`❌ ${percent}% - Vous avez dit: "${spoken}" → réécoutez et réessayez`, 'error');
+      message = `📚 ${percent}% - Réécoutez la phrase et répétez mot par mot`;
+      type = 'error';
     }
+    
+    showFeedback(`${message}\n🗣️ Vous avez dit: "${spoken.substring(0, 100)}${spoken.length > 100 ? '...' : ''}"`, type, percent);
     
     setTimeout(() => {
       if (voiceStatus.innerHTML.includes(percent)) {
-        voiceStatus.innerHTML = '🎤 En attente';
+        voiceStatus.innerHTML = '🎤 Prêt';
         voiceStatus.className = '';
       }
-    }, 2500);
+    }, 3000);
   }
 
-  function calculateSimilarity(s1, s2) {
-    let a = s1.toLowerCase().replace(/[^\w\s]/g, '').trim();
-    let b = s2.toLowerCase().replace(/[^\w\s]/g, '').trim();
-    if (a === b) return 1;
-    if (a.length === 0 || b.length === 0) return 0;
-    let wordsA = a.split(/\s+/);
-    let wordsB = b.split(/\s+/);
-    let matches = 0;
-    for (let wa of wordsA) {
-      if (wordsB.some(wb => wb === wa || wa.includes(wb) || wb.includes(wa))) matches++;
-    }
-    let ratio = matches / Math.max(wordsA.length, wordsB.length);
-    return Math.min(ratio + 0.1, 1);
-  }
-
-  // ========== Séquence complète ==========
   async function fullRepeatSequence() {
     if (isWaitingForNext) return;
     isWaitingForNext = true;
     
-    // Vérifier micro
     if (!mediaStream) {
       let ok = await initMicrophone();
-      if (!ok) {
-        isWaitingForNext = false;
-        return;
-      }
+      if (!ok) { isWaitingForNext = false; return; }
     }
-    showFeedback("🔊 Écoutez la phrase...", "info");
+    
+    showFeedback("🔊 Écoute du modèle...", "info");
     speak(segments[currentIndex], () => {
       playBeep();
       showFeedback("🎤 Après le bip, répétez la phrase", "warning");
       setTimeout(() => {
         startSpeechRecognition();
-        setTimeout(() => { isWaitingForNext = false; }, 3000);
+        setTimeout(() => { isWaitingForNext = false; }, 5000);
       }, 400);
     });
   }
 
-  // ========== Navigation ==========
   function nextSegment() {
     if (progress[currentIndex]) {
       if (currentIndex + 1 < segments.length) {
@@ -451,12 +634,12 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
         saveProgress();
         sentenceEl.innerText = segments[currentIndex];
         updateNextButton();
-        showFeedback(`📖 Segment ${currentIndex+1}/${segments.length}`, 'info');
+        showFeedback(`📖 Phrase ${currentIndex+1}/${segments.length}`, 'info');
       } else {
-        showFeedback("🎉 Vous avez terminé tout le texte !", "success");
+        showFeedback("🎉 Texte terminé ! Félicitations !", "success");
       }
     } else {
-      showFeedback("⚠️ Vous devez d'abord valider cette phrase en la répétant correctement", "warning");
+      showFeedback("⚠️ Validez d'abord cette phrase avec l'IA", "warning");
     }
   }
 
@@ -465,31 +648,60 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       progress = new Array(segments.length).fill(false);
       currentIndex = 0;
       saveProgress();
-      sentenceEl.innerText = segments[0];
+      sentenceEl.innerText = segments[currentIndex];
       updateNextButton();
       showFeedback("Progression réinitialisée", "info");
     }
   }
 
-  // ========== Événements ==========
+  function loadText(textId) {
+    currentTextId = textId;
+    const textData = textsData[textId];
+    segments = splitSentences(textData.fullText, 100);
+    textHeader.innerHTML = `<h3>📖 ${textData.title}</h3>`;
+    loadProgress();
+    resizeCanvas();
+    homeScreen.style.display = 'none';
+    practiceScreen.style.display = 'block';
+    if (recognition) try { recognition.stop(); } catch(e) {}
+    isRecording = false;
+    stopVisualization();
+    isWaitingForNext = false;
+  }
+
+  function buildHomeScreen() {
+    textGrid.innerHTML = '';
+    for (let [id, data] of Object.entries(textsData)) {
+      const card = document.createElement('div');
+      card.className = 'text-card';
+      card.innerHTML = `<h3>${data.title}</h3><p>${data.shortDesc}</p><span style="font-size:0.7rem;color:#0d6e6e;">🎤 Entraînement IA</span>`;
+      card.addEventListener('click', () => loadText(id));
+      textGrid.appendChild(card);
+    }
+  }
+
   playBtn.addEventListener('click', playCurrent);
   repeatBtn.addEventListener('click', fullRepeatSequence);
   nextBtn.addEventListener('click', nextSegment);
   resetBtn.addEventListener('click', resetAll);
-
-  requestMicBtn.addEventListener('click', async () => {
-    await initMicrophone();
+  requestMicBtn.addEventListener('click', async () => { await initMicrophone(); });
+  backToHomeBtn.addEventListener('click', () => {
+    homeScreen.style.display = 'block';
+    practiceScreen.style.display = 'none';
+    if (recognition) try { recognition.stop(); } catch(e) {}
+    stopVisualization();
+    isWaitingForNext = false;
   });
 
-  // Raccourcis clavier
   document.addEventListener('keydown', (e) => {
+    if (practiceScreen.style.display !== 'block') return;
     if (e.code === 'Space') { e.preventDefault(); playCurrent(); }
     if (e.code === 'KeyR') { e.preventDefault(); fullRepeatSequence(); }
     if (e.code === 'KeyN') { e.preventDefault(); nextSegment(); }
   });
 
-  // ========== Démarrage ==========
-  loadProgress();
+  buildHomeScreen();
+  resizeCanvas();
   initMicrophone().catch(() => {});
 </script>
 </body>
