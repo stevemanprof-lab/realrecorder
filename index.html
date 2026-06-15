@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Malaria - Prononciation simple</title>
+<title>Malaria - Prononciation avec validation</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto;background:#eef5f2;padding:20px;}
@@ -20,6 +20,9 @@
   button.outline{background:transparent;border:2px solid #0d6e6e;color:#0d6e6e;}
   button.danger{background:#e74c3c;}
   button.danger:hover{background:#c0392b;}
+  button.success{background:#27ae60;}
+  button.success:hover{background:#219a52;}
+  button:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
   .visualizer{background:#1a1a2e;border-radius:24px;padding:20px;margin:20px 0;text-align:center;}
   canvas{width:100%;height:100px;background:#0f0f1a;border-radius:20px;display:block;}
   .status{margin-top:12px;font-weight:600;}
@@ -29,7 +32,11 @@
   .progress-bar{height:10px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:15px 0;}
   .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623);width:0%;transition:width 0.3s;}
   .progress-stats{display:flex;justify-content:space-between;font-size:0.85rem;margin-top:5px;}
-  .feedback{margin-top:15px;padding:12px;border-radius:16px;background:#f8f9fa;border-left:4px solid #0d6e6e;}
+  .feedback{margin-top:15px;padding:12px;border-radius:16px;background:#f8f9fa;border-left:4px solid #0d6e6e;transition:all 0.3s;}
+  .feedback-success{background:#d4edda;border-left-color:#27ae60;color:#155724;}
+  .feedback-error{background:#f8d7da;border-left-color:#e74c3c;color:#721c24;}
+  .feedback-warning{background:#fff3cd;border-left-color:#f5a623;color:#856404;}
+  .feedback-info{background:#d1ecf1;border-left-color:#0d6e6e;color:#0c5460;}
   .perm-alert{background:#fff3cd;border-radius:16px;padding:12px;margin-bottom:15px;display:none;}
   .perm-alert.show{display:flex;justify-content:space-between;align-items:center;}
   @media(max-width:600px){.sentence-text{font-size:1rem;}}
@@ -39,14 +46,14 @@
 <div class="container">
   <div class="header">
     <h1>🦟 Malaria — Prononciation <span class="badge">Terminale</span></h1>
-    <p>Écoute, répète après le bip, améliore ton accent</p>
+    <p>Écoute, répète après le bip, valide ta prononciation</p>
   </div>
 
   <div class="card">
     <div class="controls">
       <button id="playBtn">🔊 Écouter</button>
       <button id="repeatBtn" style="background:#f5a623;">🎤 Répéter (bip → parle)</button>
-      <button id="nextBtn" class="outline">⏩ Suivant</button>
+      <button id="nextBtn" class="outline" disabled>⏩ Suivant</button>
       <button id="resetBtn" class="danger">🔄 Reset</button>
     </div>
 
@@ -72,7 +79,7 @@
       <span id="progressText">0%</span>
     </div>
 
-    <div id="feedback" class="feedback">💡 Cliquez sur "Répéter" pour démarrer</div>
+    <div id="feedback" class="feedback feedback-info">💡 Cliquez sur "Répéter" pour démarrer</div>
   </div>
 </div>
 
@@ -82,7 +89,7 @@
 The symptoms of malaria remain undetectable for the first few days after the bite. The first signs appear 9 to 30 days after the infection, depending on the species of Plasmodium involved. For the most common species (Plasmodium Falciparum), the incubation period is usually 9 to 14 days.
 Malaria disease and associated symptoms can be classified as "simple" or "complicated". The disease is said to be simple when it manifests as a flu-like illness. The patient suffers from fever, headache, chills and muscles pain. And it is complicated or severe when the parasite reaches a vital organ. This form can appear in the case of infection by plasmodium falciparum and plasmodium vivax. The high number of deaths is mainly due to delayed or inadequate treatment. Prevention is essential in the fight against malaria in Africa.`;
 
-  // ========== Découpage en segments (courts) ==========
+  // ========== Découpage en segments ==========
   function splitSentences(text, maxLen=110) {
     let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
     let segments = [];
@@ -126,7 +133,8 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
   let analyser = null;
   let animationId = null;
   let isRecording = false;
-  let recognition = null;   // Web Speech API
+  let recognition = null;
+  let isWaitingForNext = false; // Empêcher les doublons
 
   // Redimension canvas
   function resizeCanvas() {
@@ -144,32 +152,60 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
     if (savedIdx && parseInt(savedIdx) < segments.length) currentIndex = parseInt(savedIdx);
     updateProgressUI();
     sentenceEl.innerText = segments[currentIndex];
+    updateNextButton();
   }
+  
   function saveProgress() {
     localStorage.setItem('malaria_prog', JSON.stringify(progress));
     localStorage.setItem('malaria_idx', currentIndex);
     updateProgressUI();
   }
+  
   function updateProgressUI() {
     let done = progress.filter(v=>v===true).length;
     let percent = Math.round((done/segments.length)*100);
     progressFill.style.width = percent+'%';
     progressText.innerText = `${done}/${segments.length} (${percent}%)`;
   }
+  
+  function updateNextButton() {
+    // Activer le bouton Suivant seulement si la phrase courante est validée
+    nextBtn.disabled = !progress[currentIndex];
+    if (progress[currentIndex]) {
+      nextBtn.classList.add('success');
+      nextBtn.style.background = '#27ae60';
+    } else {
+      nextBtn.classList.remove('success');
+      nextBtn.style.background = '';
+    }
+  }
+  
   function markCurrentDone() {
     if (!progress[currentIndex]) {
       progress[currentIndex] = true;
       saveProgress();
-      showFeedback(`✅ Félicitations ! Segment ${currentIndex+1} réussi !`, '#27ae60');
+      updateNextButton();
+      showFeedback(`✅ Félicitations ! Segment ${currentIndex+1} validé !`, 'success');
+      return true;
     }
+    return false;
   }
 
-  function showFeedback(msg, color='#0d6e6e') {
+  function showFeedback(msg, type='info') {
+    let className = '';
+    if (type === 'success') className = 'feedback-success';
+    else if (type === 'error') className = 'feedback-error';
+    else if (type === 'warning') className = 'feedback-warning';
+    else className = 'feedback-info';
+    
     feedbackDiv.innerHTML = msg;
-    feedbackDiv.style.borderLeftColor = color;
+    feedbackDiv.className = `feedback ${className}`;
     setTimeout(() => {
-      if (feedbackDiv.innerHTML === msg) feedbackDiv.innerHTML = '💡 Cliquez sur "Répéter" pour continuer';
-    }, 3500);
+      if (feedbackDiv.innerHTML === msg) {
+        feedbackDiv.innerHTML = '💡 Cliquez sur "Répéter" pour continuer';
+        feedbackDiv.className = 'feedback feedback-info';
+      }
+    }, 4000);
   }
 
   // ========== Synthèse vocale ==========
@@ -185,24 +221,24 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
 
   function playCurrent() {
     speak(segments[currentIndex]);
-    showFeedback(`🔊 Écoute du segment ${currentIndex+1}/${segments.length}`);
+    showFeedback(`🔊 Écoute du segment ${currentIndex+1}/${segments.length}`, 'info');
   }
 
   // ========== Bip sonore ==========
   function playBeep() {
     try {
-      let ctx = new (window.AudioContext || window.webkitAudioContext)();
-      let osc = ctx.createOscillator();
-      let gain = ctx.createGain();
+      let ctxBeep = new (window.AudioContext || window.webkitAudioContext)();
+      let osc = ctxBeep.createOscillator();
+      let gain = ctxBeep.createGain();
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(ctxBeep.destination);
       osc.frequency.value = 880;
       osc.type = 'sine';
       gain.gain.value = 0.2;
       osc.start();
-      gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.4);
-      osc.stop(ctx.currentTime + 0.4);
-      setTimeout(() => ctx.close(), 500);
+      gain.gain.exponentialRampToValueAtTime(0.00001, ctxBeep.currentTime + 0.4);
+      osc.stop(ctxBeep.currentTime + 0.4);
+      setTimeout(() => ctxBeep.close(), 500);
     } catch(e) { console.log('beep error'); }
   }
 
@@ -222,12 +258,12 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       source.connect(analyser);
       await audioContext.resume();
       permAlert.classList.remove('show');
-      showFeedback('🎤 Microphone prêt !', '#27ae60');
+      showFeedback('🎤 Microphone prêt !', 'success');
       return true;
     } catch(err) {
       console.error(err);
       permAlert.classList.add('show');
-      showFeedback('❌ Microphone non autorisé. Cliquez sur "Autoriser"', '#e74c3c');
+      showFeedback('❌ Microphone non autorisé. Cliquez sur "Autoriser"', 'error');
       return false;
     }
   }
@@ -270,10 +306,10 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // ========== Reconnaissance vocale (Web Speech) ==========
+  // ========== Reconnaissance vocale ==========
   function startSpeechRecognition() {
     if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
-      showFeedback("❌ Reconnaissance vocale non supportée (utilisez Chrome/Edge)", "#e74c3c");
+      showFeedback("❌ Reconnaissance vocale non supportée (utilisez Chrome/Edge)", "error");
       return false;
     }
     const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -298,9 +334,9 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       console.error(event.error);
       if (event.error === 'not-allowed') {
         permAlert.classList.add('show');
-        showFeedback("❌ Permission microphone refusée", "#e74c3c");
+        showFeedback("❌ Permission microphone refusée", "error");
       } else {
-        showFeedback(`❌ Erreur: ${event.error}. Réessayez`, "#e74c3c");
+        showFeedback(`❌ Erreur: ${event.error}. Réessayez`, "error");
       }
       stopListening();
     };
@@ -315,7 +351,7 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       recognition.start();
       return true;
     } catch(e) {
-      showFeedback("Erreur de démarrage", "#e74c3c");
+      showFeedback("Erreur de démarrage", "error");
       return false;
     }
   }
@@ -336,23 +372,30 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
     voiceStatus.className = 'status success';
 
     if (sim >= 0.65) {
-      showFeedback(`✅ Excellent ! (${percent}%) - "${spoken}"`, '#27ae60');
-      markCurrentDone();
-      setTimeout(() => {
-        if (currentIndex + 1 < segments.length) {
+      showFeedback(`✅ Excellent ! (${percent}%) - "${spoken}"`, 'success');
+      const wasValidated = markCurrentDone();
+      
+      // Passage automatique à la phrase suivante après validation
+      if (wasValidated && currentIndex + 1 < segments.length) {
+        setTimeout(() => {
           currentIndex++;
           saveProgress();
           sentenceEl.innerText = segments[currentIndex];
-          showFeedback(`📖 Passons au segment ${currentIndex+1}`, '#0d6e6e');
-        } else {
-          showFeedback("🏆 Félicitations ! Texte terminé !", "#f5a623");
-        }
-      }, 2000);
+          updateNextButton();
+          showFeedback(`📖 Passons au segment ${currentIndex+1}/${segments.length}`, 'info');
+          // Auto-play de la nouvelle phrase ?
+        }, 2000);
+      } else if (wasValidated && currentIndex + 1 >= segments.length) {
+        setTimeout(() => {
+          showFeedback("🏆 Félicitations ! Vous avez terminé tout le texte !", "success");
+        }, 1500);
+      }
     } else if (sim >= 0.45) {
-      showFeedback(`👍 ${percent}% - "${spoken}" → encore un effort`, '#f5a623');
+      showFeedback(`👍 ${percent}% - "${spoken}" → encore un effort`, 'warning');
     } else {
-      showFeedback(`❌ ${percent}% - Vous avez dit: "${spoken}" → réécoutez et réessayez`, '#e74c3c');
+      showFeedback(`❌ ${percent}% - Vous avez dit: "${spoken}" → réécoutez et réessayez`, 'error');
     }
+    
     setTimeout(() => {
       if (voiceStatus.innerHTML.includes(percent)) {
         voiceStatus.innerHTML = '🎤 En attente';
@@ -376,32 +419,44 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
     return Math.min(ratio + 0.1, 1);
   }
 
-  // ========== Séquence complète : écouter + bip + reconnaissance ==========
+  // ========== Séquence complète ==========
   async function fullRepeatSequence() {
+    if (isWaitingForNext) return;
+    isWaitingForNext = true;
+    
     // Vérifier micro
     if (!mediaStream) {
       let ok = await initMicrophone();
-      if (!ok) return;
+      if (!ok) {
+        isWaitingForNext = false;
+        return;
+      }
     }
-    showFeedback("🔊 Écoutez la phrase...", "#0d6e6e");
+    showFeedback("🔊 Écoutez la phrase...", "info");
     speak(segments[currentIndex], () => {
       playBeep();
-      showFeedback("🎤 Après le bip, répétez", "#f5a623");
+      showFeedback("🎤 Après le bip, répétez la phrase", "warning");
       setTimeout(() => {
         startSpeechRecognition();
+        setTimeout(() => { isWaitingForNext = false; }, 3000);
       }, 400);
     });
   }
 
   // ========== Navigation ==========
   function nextSegment() {
-    if (currentIndex + 1 < segments.length) {
-      currentIndex++;
-      saveProgress();
-      sentenceEl.innerText = segments[currentIndex];
-      showFeedback(`📖 Segment ${currentIndex+1}/${segments.length}`);
+    if (progress[currentIndex]) {
+      if (currentIndex + 1 < segments.length) {
+        currentIndex++;
+        saveProgress();
+        sentenceEl.innerText = segments[currentIndex];
+        updateNextButton();
+        showFeedback(`📖 Segment ${currentIndex+1}/${segments.length}`, 'info');
+      } else {
+        showFeedback("🎉 Vous avez terminé tout le texte !", "success");
+      }
     } else {
-      showFeedback("🎉 Vous avez terminé !", "#27ae60");
+      showFeedback("⚠️ Vous devez d'abord valider cette phrase en la répétant correctement", "warning");
     }
   }
 
@@ -411,7 +466,8 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
       currentIndex = 0;
       saveProgress();
       sentenceEl.innerText = segments[0];
-      showFeedback("Progression réinitialisée", "#f5a623");
+      updateNextButton();
+      showFeedback("Progression réinitialisée", "info");
     }
   }
 
@@ -434,7 +490,6 @@ Malaria disease and associated symptoms can be classified as "simple" or "compli
 
   // ========== Démarrage ==========
   loadProgress();
-  // Tenter d'initialiser le micro silencieusement
   initMicrophone().catch(() => {});
 </script>
 </body>
