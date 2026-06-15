@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malaria - Prononciation simple</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto;background:#eef5f2;padding:20px;}
+  .container{max-width:900px;margin:0 auto;}
+  .header{background:#0d6e6e;color:white;padding:20px 25px;border-radius:28px;margin-bottom:20px;}
+  .header h1{font-size:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+  .badge{background:rgba(255,255,255,0.2);padding:5px 12px;border-radius:40px;font-size:0.8rem;}
+  .card{background:white;border-radius:24px;padding:24px;margin-bottom:20px;box-shadow:0 8px 20px rgba(0,0,0,0.05);}
+  .sentence-box{background:#e6f4f1;border-left:5px solid #0d6e6e;padding:20px;border-radius:18px;margin-bottom:20px;}
+  .sentence-text{font-size:1.3rem;font-weight:500;line-height:1.4;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+  button{background:#0d6e6e;border:none;padding:10px 18px;border-radius:40px;color:white;font-weight:600;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:6px;}
+  button:hover{background:#0a5555;transform:translateY(-2px);}
+  button.outline{background:transparent;border:2px solid #0d6e6e;color:#0d6e6e;}
+  button.danger{background:#e74c3c;}
+  button.danger:hover{background:#c0392b;}
+  .visualizer{background:#1a1a2e;border-radius:24px;padding:20px;margin:20px 0;text-align:center;}
+  canvas{width:100%;height:100px;background:#0f0f1a;border-radius:20px;display:block;}
+  .status{margin-top:12px;font-weight:600;}
+  .status.listening{color:#e74c3c;animation:pulse 1s infinite;}
+  .status.success{color:#27ae60;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+  .progress-bar{height:10px;background:#e0e0e0;border-radius:10px;overflow:hidden;margin:15px 0;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#0d6e6e,#f5a623);width:0%;transition:width 0.3s;}
+  .progress-stats{display:flex;justify-content:space-between;font-size:0.85rem;margin-top:5px;}
+  .feedback{margin-top:15px;padding:12px;border-radius:16px;background:#f8f9fa;border-left:4px solid #0d6e6e;}
+  .perm-alert{background:#fff3cd;border-radius:16px;padding:12px;margin-bottom:15px;display:none;}
+  .perm-alert.show{display:flex;justify-content:space-between;align-items:center;}
+  @media(max-width:600px){.sentence-text{font-size:1rem;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🦟 Malaria — Prononciation <span class="badge">Terminale</span></h1>
+    <p>Écoute, répète après le bip, améliore ton accent</p>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <button id="playBtn">🔊 Écouter</button>
+      <button id="repeatBtn" style="background:#f5a623;">🎤 Répéter (bip → parle)</button>
+      <button id="nextBtn" class="outline">⏩ Suivant</button>
+      <button id="resetBtn" class="danger">🔄 Reset</button>
+    </div>
+
+    <div class="sentence-box">
+      <div class="sentence-text" id="sentenceText">Chargement...</div>
+    </div>
+
+    <div id="permAlert" class="perm-alert">
+      <span>🎤 Autorisez le microphone pour la reconnaissance vocale</span>
+      <button id="requestMicBtn" style="background:#f5a623; padding:6px 12px;">Autoriser</button>
+    </div>
+
+    <div class="visualizer">
+      <canvas id="voiceCanvas" width="800" height="100"></canvas>
+      <div class="status" id="voiceStatus">🎤 En attente</div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-stats">
+      <span>📊 Progression</span>
+      <span id="progressText">0%</span>
+    </div>
+
+    <div id="feedback" class="feedback">💡 Cliquez sur "Répéter" pour démarrer</div>
+  </div>
+</div>
+
+<script>
+  // ========== TEXTE COMPLET ==========
+  const fullText = `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites : they vary according to the geographical area affected and cause different symptoms : plasmodium falciparum, plasmodium vivax, plasmodium ovale, plasmodium malariae , plasmodium knowlesi.
+The symptoms of malaria remain undetectable for the first few days after the bite. The first signs appear 9 to 30 days after the infection, depending on the species of Plasmodium involved. For the most common species (Plasmodium Falciparum), the incubation period is usually 9 to 14 days.
+Malaria disease and associated symptoms can be classified as "simple" or "complicated". The disease is said to be simple when it manifests as a flu-like illness. The patient suffers from fever, headache, chills and muscles pain. And it is complicated or severe when the parasite reaches a vital organ. This form can appear in the case of infection by plasmodium falciparum and plasmodium vivax. The high number of deaths is mainly due to delayed or inadequate treatment. Prevention is essential in the fight against malaria in Africa.`;
+
+  // ========== Découpage en segments (courts) ==========
+  function splitSentences(text, maxLen=110) {
+    let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    let segments = [];
+    for (let s of sentences) {
+      s = s.trim();
+      if (s.length <= maxLen) segments.push(s);
+      else {
+        let words = s.split(' ');
+        let current = '';
+        for (let w of words) {
+          if ((current + ' ' + w).length <= maxLen) current = current ? current + ' ' + w : w;
+          else { if(current) segments.push(current); current = w; }
+        }
+        if(current) segments.push(current);
+      }
+    }
+    return segments;
+  }
+  const segments = splitSentences(fullText, 110);
+  let currentIndex = 0;
+  let progress = new Array(segments.length).fill(false);
+
+  // DOM elements
+  const sentenceEl = document.getElementById('sentenceText');
+  const playBtn = document.getElementById('playBtn');
+  const repeatBtn = document.getElementById('repeatBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const requestMicBtn = document.getElementById('requestMicBtn');
+  const permAlert = document.getElementById('permAlert');
+  const voiceStatus = document.getElementById('voiceStatus');
+  const feedbackDiv = document.getElementById('feedback');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const canvas = document.getElementById('voiceCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Variables audio
+  let mediaStream = null;
+  let audioContext = null;
+  let analyser = null;
+  let animationId = null;
+  let isRecording = false;
+  let recognition = null;   // Web Speech API
+
+  // Redimension canvas
+  function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth - 40;
+    canvas.height = 100;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // ========== Progression ==========
+  function loadProgress() {
+    let saved = localStorage.getItem('malaria_prog');
+    let savedIdx = localStorage.getItem('malaria_idx');
+    if (saved) progress = JSON.parse(saved);
+    if (savedIdx && parseInt(savedIdx) < segments.length) currentIndex = parseInt(savedIdx);
+    updateProgressUI();
+    sentenceEl.innerText = segments[currentIndex];
+  }
+  function saveProgress() {
+    localStorage.setItem('malaria_prog', JSON.stringify(progress));
+    localStorage.setItem('malaria_idx', currentIndex);
+    updateProgressUI();
+  }
+  function updateProgressUI() {
+    let done = progress.filter(v=>v===true).length;
+    let percent = Math.round((done/segments.length)*100);
+    progressFill.style.width = percent+'%';
+    progressText.innerText = `${done}/${segments.length} (${percent}%)`;
+  }
+  function markCurrentDone() {
+    if (!progress[currentIndex]) {
+      progress[currentIndex] = true;
+      saveProgress();
+      showFeedback(`✅ Félicitations ! Segment ${currentIndex+1} réussi !`, '#27ae60');
+    }
+  }
+
+  function showFeedback(msg, color='#0d6e6e') {
+    feedbackDiv.innerHTML = msg;
+    feedbackDiv.style.borderLeftColor = color;
+    setTimeout(() => {
+      if (feedbackDiv.innerHTML === msg) feedbackDiv.innerHTML = '💡 Cliquez sur "Répéter" pour continuer';
+    }, 3500);
+  }
+
+  // ========== Synthèse vocale ==========
+  function speak(text, callback) {
+    if (!window.speechSynthesis) return;
+    let utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 0.85;
+    utter.onend = () => { if(callback) callback(); };
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+
+  function playCurrent() {
+    speak(segments[currentIndex]);
+    showFeedback(`🔊 Écoute du segment ${currentIndex+1}/${segments.length}`);
+  }
+
+  // ========== Bip sonore ==========
+  function playBeep() {
+    try {
+      let ctx = new (window.AudioContext || window.webkitAudioContext)();
+      let osc = ctx.createOscillator();
+      let gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = 'sine';
+      gain.gain.value = 0.2;
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.4);
+      osc.stop(ctx.currentTime + 0.4);
+      setTimeout(() => ctx.close(), 500);
+    } catch(e) { console.log('beep error'); }
+  }
+
+  // ========== Visualisation microphone ==========
+  async function initMicrophone() {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(t => t.stop());
+    }
+    if (audioContext) await audioContext.close();
+    try {
+      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStream = stream;
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      let source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+      await audioContext.resume();
+      permAlert.classList.remove('show');
+      showFeedback('🎤 Microphone prêt !', '#27ae60');
+      return true;
+    } catch(err) {
+      console.error(err);
+      permAlert.classList.add('show');
+      showFeedback('❌ Microphone non autorisé. Cliquez sur "Autoriser"', '#e74c3c');
+      return false;
+    }
+  }
+
+  function startVisualization() {
+    if (animationId) cancelAnimationFrame(animationId);
+    if (!analyser) return;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    function draw() {
+      if (!isRecording || !analyser) {
+        if (animationId) cancelAnimationFrame(animationId);
+        return;
+      }
+      analyser.getByteTimeDomainData(dataArray);
+      ctx.fillStyle = '#0f0f1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      let sliceWidth = canvas.width / bufferLength;
+      let x = 0;
+      ctx.beginPath();
+      ctx.strokeStyle = '#0d6e6e';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < bufferLength; i++) {
+        let v = dataArray[i] / 128.0;
+        let y = (v * canvas.height) / 2;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+        x += sliceWidth;
+      }
+      ctx.stroke();
+      animationId = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  function stopVisualization() {
+    isRecording = false;
+    if (animationId) cancelAnimationFrame(animationId);
+    ctx.fillStyle = '#0f0f1a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // ========== Reconnaissance vocale (Web Speech) ==========
+  function startSpeechRecognition() {
+    if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
+      showFeedback("❌ Reconnaissance vocale non supportée (utilisez Chrome/Edge)", "#e74c3c");
+      return false;
+    }
+    const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecog();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      voiceStatus.innerHTML = '🎤🔴 Écoute en cours... Parlez';
+      voiceStatus.className = 'status listening';
+      startVisualization();
+    };
+
+    recognition.onresult = (event) => {
+      let transcript = event.results[0][0].transcript;
+      evaluateSimilarity(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error(event.error);
+      if (event.error === 'not-allowed') {
+        permAlert.classList.add('show');
+        showFeedback("❌ Permission microphone refusée", "#e74c3c");
+      } else {
+        showFeedback(`❌ Erreur: ${event.error}. Réessayez`, "#e74c3c");
+      }
+      stopListening();
+    };
+
+    recognition.onend = () => {
+      stopListening();
+      voiceStatus.innerHTML = '🎤 Prêt';
+      voiceStatus.className = '';
+    };
+
+    try {
+      recognition.start();
+      return true;
+    } catch(e) {
+      showFeedback("Erreur de démarrage", "#e74c3c");
+      return false;
+    }
+  }
+
+  function stopListening() {
+    if (recognition) {
+      try { recognition.stop(); } catch(e) {}
+    }
+    isRecording = false;
+    stopVisualization();
+  }
+
+  function evaluateSimilarity(spoken) {
+    const target = segments[currentIndex];
+    const sim = calculateSimilarity(spoken, target);
+    const percent = Math.round(sim * 100);
+    voiceStatus.innerHTML = `🎤✅ ${percent}% de correspondance`;
+    voiceStatus.className = 'status success';
+
+    if (sim >= 0.65) {
+      showFeedback(`✅ Excellent ! (${percent}%) - "${spoken}"`, '#27ae60');
+      markCurrentDone();
+      setTimeout(() => {
+        if (currentIndex + 1 < segments.length) {
+          currentIndex++;
+          saveProgress();
+          sentenceEl.innerText = segments[currentIndex];
+          showFeedback(`📖 Passons au segment ${currentIndex+1}`, '#0d6e6e');
+        } else {
+          showFeedback("🏆 Félicitations ! Texte terminé !", "#f5a623");
+        }
+      }, 2000);
+    } else if (sim >= 0.45) {
+      showFeedback(`👍 ${percent}% - "${spoken}" → encore un effort`, '#f5a623');
+    } else {
+      showFeedback(`❌ ${percent}% - Vous avez dit: "${spoken}" → réécoutez et réessayez`, '#e74c3c');
+    }
+    setTimeout(() => {
+      if (voiceStatus.innerHTML.includes(percent)) {
+        voiceStatus.innerHTML = '🎤 En attente';
+        voiceStatus.className = '';
+      }
+    }, 2500);
+  }
+
+  function calculateSimilarity(s1, s2) {
+    let a = s1.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    let b = s2.toLowerCase().replace(/[^\w\s]/g, '').trim();
+    if (a === b) return 1;
+    if (a.length === 0 || b.length === 0) return 0;
+    let wordsA = a.split(/\s+/);
+    let wordsB = b.split(/\s+/);
+    let matches = 0;
+    for (let wa of wordsA) {
+      if (wordsB.some(wb => wb === wa || wa.includes(wb) || wb.includes(wa))) matches++;
+    }
+    let ratio = matches / Math.max(wordsA.length, wordsB.length);
+    return Math.min(ratio + 0.1, 1);
+  }
+
+  // ========== Séquence complète : écouter + bip + reconnaissance ==========
+  async function fullRepeatSequence() {
+    // Vérifier micro
+    if (!mediaStream) {
+      let ok = await initMicrophone();
+      if (!ok) return;
+    }
+    showFeedback("🔊 Écoutez la phrase...", "#0d6e6e");
+    speak(segments[currentIndex], () => {
+      playBeep();
+      showFeedback("🎤 Après le bip, répétez", "#f5a623");
+      setTimeout(() => {
+        startSpeechRecognition();
+      }, 400);
+    });
+  }
+
+  // ========== Navigation ==========
+  function nextSegment() {
+    if (currentIndex + 1 < segments.length) {
+      currentIndex++;
+      saveProgress();
+      sentenceEl.innerText = segments[currentIndex];
+      showFeedback(`📖 Segment ${currentIndex+1}/${segments.length}`);
+    } else {
+      showFeedback("🎉 Vous avez terminé !", "#27ae60");
+    }
+  }
+
+  function resetAll() {
+    if (confirm("Réinitialiser toute progression ?")) {
+      progress = new Array(segments.length).fill(false);
+      currentIndex = 0;
+      saveProgress();
+      sentenceEl.innerText = segments[0];
+      showFeedback("Progression réinitialisée", "#f5a623");
+    }
+  }
+
+  // ========== Événements ==========
+  playBtn.addEventListener('click', playCurrent);
+  repeatBtn.addEventListener('click', fullRepeatSequence);
+  nextBtn.addEventListener('click', nextSegment);
+  resetBtn.addEventListener('click', resetAll);
+
+  requestMicBtn.addEventListener('click', async () => {
+    await initMicrophone();
+  });
+
+  // Raccourcis clavier
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); playCurrent(); }
+    if (e.code === 'KeyR') { e.preventDefault(); fullRepeatSequence(); }
+    if (e.code === 'KeyN') { e.preventDefault(); nextSegment(); }
+  });
+
+  // ========== Démarrage ==========
+  loadProgress();
+  // Tenter d'initialiser le micro silencieusement
+  initMicrophone().catch(() => {});
+</script>
+</body>
+</html>
