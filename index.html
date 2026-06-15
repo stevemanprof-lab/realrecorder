@@ -39,7 +39,6 @@
   button.success{background:#27ae60;}
   button:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
   
-  /* Visualiseur avancé */
   .visualizer{background:#1a1a2e;border-radius:24px;padding:20px;margin:20px 0;text-align:center;}
   canvas{width:100%;height:120px;background:#0f0f1a;border-radius:20px;display:block;}
   .status{margin-top:12px;font-weight:600;font-size:1rem;}
@@ -60,10 +59,11 @@
   
   .score-circle{display:inline-block;width:60px;height:60px;border-radius:50%;background:#1a1a2e;color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;margin-right:15px;}
   
-  .word-highlight{background:#f5a623;color:white;padding:2px 6px;border-radius:12px;font-size:0.8rem;margin-left:8px;}
-  
   .perm-alert{background:#fff3cd;border-radius:20px;padding:12px;margin-bottom:15px;display:none;}
   .perm-alert.show{display:flex;justify-content:space-between;align-items:center;}
+  
+  .micro-status{background:#e8f5e9;border-radius:20px;padding:8px 15px;margin-bottom:15px;text-align:center;font-size:0.85rem;color:#2e7d32;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .micro-status.error{background:#ffebee;color:#c62828;}
   
   @media(max-width:600px){.sentence-text{font-size:1rem;}.controls button{padding:8px 16px;font-size:0.85rem;}}
 </style>
@@ -84,6 +84,10 @@
     <button id="backToHomeBtn" class="back-btn">← Retour aux textes</button>
     <div class="card">
       <div id="textHeader" class="text-header"></div>
+      
+      <!-- Indicateur de statut du microphone -->
+      <div id="microStatus" class="micro-status">🎤 Initialisation du microphone...</div>
+      
       <div class="controls">
         <button id="playBtn">🔊 Écouter</button>
         <button id="repeatBtn" style="background:#f5a623;">🎤 IA Écoute & Analyse</button>
@@ -203,7 +207,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   let currentIndex = 0;
   let progress = [];
   
-  // Audio variables
+  // Audio variables - GLOBALES et PERSISTANTES
   let mediaStream = null;
   let audioContext = null;
   let analyser = null;
@@ -211,6 +215,8 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   let isRecording = false;
   let recognition = null;
   let isWaitingForNext = false;
+  let isMicrophoneReady = false;
+  let isMicrophoneRequested = false;
 
   // DOM
   const homeScreen = document.getElementById('homeScreen');
@@ -231,6 +237,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
   const progressText = document.getElementById('progressText');
   const canvas = document.getElementById('voiceCanvas');
   const ctx = canvas.getContext('2d');
+  const microStatusDiv = document.getElementById('microStatus');
 
   function resizeCanvas() {
     if (canvas.parentElement) {
@@ -342,12 +349,30 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     } catch(e) {}
   }
 
-  // Microphone
+  // ========== INITIALISATION UNIQUE DU MICROPHONE ==========
   async function initMicrophone() {
-    if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-    if (audioContext) await audioContext.close();
+    if (isMicrophoneReady && mediaStream && mediaStream.active) {
+      microStatusDiv.innerHTML = '🎤 Microphone actif ✅';
+      microStatusDiv.className = 'micro-status';
+      return true;
+    }
+    
+    if (isMicrophoneRequested) {
+      microStatusDiv.innerHTML = '🎤 Demande en cours...';
+      return false;
+    }
+    
+    isMicrophoneRequested = true;
+    microStatusDiv.innerHTML = '🎤 Demande d\'accès au microphone...';
+    
     try {
       let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop());
+      }
+      if (audioContext) await audioContext.close();
+      
       mediaStream = stream;
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
       analyser = audioContext.createAnalyser();
@@ -355,22 +380,33 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       let source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
       await audioContext.resume();
+      
+      isMicrophoneReady = true;
+      isMicrophoneRequested = false;
       permAlert.classList.remove('show');
+      microStatusDiv.innerHTML = '🎤 Microphone actif ✅ Prêt pour l\'analyse vocale';
+      microStatusDiv.className = 'micro-status';
+      showFeedback('🎤 Microphone prêt ! Cliquez sur "IA Écoute & Analyse"', 'success');
       return true;
+      
     } catch(err) {
+      console.error(err);
+      isMicrophoneReady = false;
+      isMicrophoneRequested = false;
+      microStatusDiv.innerHTML = '🎤❌ Microphone non autorisé';
+      microStatusDiv.className = 'micro-status error';
       permAlert.classList.add('show');
-      showFeedback('❌ Activez le microphone dans les paramètres', 'error');
+      showFeedback('❌ Activez le microphone dans les paramètres du navigateur', 'error');
       return false;
     }
   }
 
-  // Visualisation avancée avec analyse d'amplitude
+  // Visualisation
   function startVisualization() {
     if (animationId) cancelAnimationFrame(animationId);
     if (!analyser) return;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    let lastAmplitude = 0;
     
     function draw() {
       if (!isRecording || !analyser) {
@@ -409,7 +445,7 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // ========== ALGORITHME DE SIMILARITÉ AVANCÉ ==========
+  // Algorithme de similarité
   function advancedSimilarity(spoken, target) {
     let spokenNorm = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
     let targetNorm = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
@@ -420,7 +456,6 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     let spokenWords = spokenNorm.split(/\s+/);
     let targetWords = targetNorm.split(/\s+/);
     
-    // Calcul du score par mot avec pondération
     let totalScore = 0;
     let maxPossible = targetWords.length;
     
@@ -431,16 +466,13 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       for (let j = 0; j < spokenWords.length; j++) {
         let spokenWord = spokenWords[j];
         
-        // Exact match
         if (spokenWord === targetWord) {
           bestMatch = 1;
           break;
         }
-        // Contains or starts with
         if (spokenWord.includes(targetWord) || targetWord.includes(spokenWord)) {
           bestMatch = Math.max(bestMatch, 0.85);
         }
-        // Levenshtein pour mots similaires
         else {
           let len = Math.max(spokenWord.length, targetWord.length);
           let dist = levenshteinDistance(spokenWord, targetWord);
@@ -451,7 +483,6 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
       totalScore += bestMatch;
     }
     
-    // Bonus pour l'ordre approximatif des mots
     let orderBonus = 0;
     for (let i = 0; i < Math.min(spokenWords.length, targetWords.length); i++) {
       if (spokenWords[i] === targetWords[i]) orderBonus += 0.05;
@@ -478,16 +509,32 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     return matrix[b.length][a.length];
   }
 
-  // Reconnaissance vocale avancée
+  // ========== RECONNAISSANCE VOCALE AVEC MICROPHONE PERSISTANT ==========
   function startSpeechRecognition() {
+    if (!isMicrophoneReady) {
+      showFeedback("🎤 Initialisation du microphone...", "warning");
+      initMicrophone().then(success => {
+        if (success) startSpeechRecognitionInternal();
+      });
+      return;
+    }
+    startSpeechRecognitionInternal();
+  }
+  
+  function startSpeechRecognitionInternal() {
     if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
       showFeedback("❌ Utilisez Chrome ou Edge pour la reconnaissance vocale", "error");
-      return false;
+      return;
     }
+    
+    if (recognition) {
+      try { recognition.stop(); } catch(e) {}
+    }
+    
     const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecog();
     recognition.lang = 'en-US';
-    recognition.interimResults = true;
+    recognition.interimResults = false;
     recognition.maxAlternatives = 3;
     recognition.continuous = false;
 
@@ -522,8 +569,9 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
 
     recognition.onerror = (event) => {
       if (event.error === 'not-allowed') {
+        isMicrophoneReady = false;
         permAlert.classList.add('show');
-        showFeedback("❌ Autorisez le microphone", "error");
+        showFeedback("❌ Autorisez le microphone dans les paramètres", "error");
       } else if (event.error === 'no-speech') {
         showFeedback("🎤 Aucun son détecté. Parlez plus fort", "warning");
         voiceStatus.innerHTML = '🎤 En attente';
@@ -544,17 +592,12 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
 
     try {
       recognition.start();
-      return true;
     } catch(e) {
       showFeedback("Erreur de démarrage", "error");
-      return false;
     }
   }
 
   function stopListening() {
-    if (recognition) {
-      try { recognition.stop(); } catch(e) {}
-    }
     isRecording = false;
     stopVisualization();
   }
@@ -567,12 +610,8 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     voiceStatus.innerHTML = `🎤✅ Analyse: ${percent}% de correspondance`;
     voiceStatus.className = 'status success';
     
-    let message = '';
-    let type = '';
-    
     if (similarity >= 0.78) {
-      message = `Excellent ! ${percent}% - Prononciation très proche du modèle`;
-      type = 'success';
+      showFeedback(`Excellent ! ${percent}% - Prononciation très proche du modèle`, 'success', percent);
       const validated = markCurrentDone();
       
       if (validated && currentIndex + 1 < segments.length) {
@@ -587,17 +626,12 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
         setTimeout(() => showFeedback("🏆 Félicitations ! Texte terminé !", "success"), 1500);
       }
     } else if (similarity >= 0.6) {
-      message = `Bon travail ! ${percent}% - Quelques mots à améliorer, réessayez`;
-      type = 'warning';
+      showFeedback(`Bon travail ! ${percent}% - Quelques mots à améliorer, réessayez`, 'warning', percent);
     } else if (similarity >= 0.4) {
-      message = `👍 ${percent}% - Écoutez bien et répétez plus lentement`;
-      type = 'warning';
+      showFeedback(`👍 ${percent}% - Écoutez bien et répétez plus lentement`, 'warning', percent);
     } else {
-      message = `📚 ${percent}% - Réécoutez la phrase et répétez mot par mot`;
-      type = 'error';
+      showFeedback(`📚 ${percent}% - Réécoutez la phrase et répétez mot par mot`, 'error', percent);
     }
-    
-    showFeedback(`${message}\n🗣️ Vous avez dit: "${spoken.substring(0, 100)}${spoken.length > 100 ? '...' : ''}"`, type, percent);
     
     setTimeout(() => {
       if (voiceStatus.innerHTML.includes(percent)) {
@@ -611,9 +645,12 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     if (isWaitingForNext) return;
     isWaitingForNext = true;
     
-    if (!mediaStream) {
+    if (!isMicrophoneReady) {
       let ok = await initMicrophone();
-      if (!ok) { isWaitingForNext = false; return; }
+      if (!ok) { 
+        isWaitingForNext = false; 
+        return; 
+      }
     }
     
     showFeedback("🔊 Écoute du modèle...", "info");
@@ -663,10 +700,14 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     resizeCanvas();
     homeScreen.style.display = 'none';
     practiceScreen.style.display = 'block';
-    if (recognition) try { recognition.stop(); } catch(e) {}
+    isWaitingForNext = false;
+    
+    // Réinitialiser l'état de reconnaissance sans fermer le micro
+    if (recognition) {
+      try { recognition.stop(); } catch(e) {}
+    }
     isRecording = false;
     stopVisualization();
-    isWaitingForNext = false;
   }
 
   function buildHomeScreen() {
@@ -680,16 +721,17 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     }
   }
 
+  // Événements
   playBtn.addEventListener('click', playCurrent);
   repeatBtn.addEventListener('click', fullRepeatSequence);
   nextBtn.addEventListener('click', nextSegment);
   resetBtn.addEventListener('click', resetAll);
-  requestMicBtn.addEventListener('click', async () => { await initMicrophone(); });
+  requestMicBtn.addEventListener('click', async () => { 
+    await initMicrophone();
+  });
   backToHomeBtn.addEventListener('click', () => {
     homeScreen.style.display = 'block';
     practiceScreen.style.display = 'none';
-    if (recognition) try { recognition.stop(); } catch(e) {}
-    stopVisualization();
     isWaitingForNext = false;
   });
 
@@ -700,8 +742,11 @@ Forests act as carbon sinks. When they are destroyed, carbon is released and the
     if (e.code === 'KeyN') { e.preventDefault(); nextSegment(); }
   });
 
+  // Démarrage - initialisation silencieuse
   buildHomeScreen();
   resizeCanvas();
+  
+  // Initialisation automatique et silencieuse du microphone au chargement
   initMicrophone().catch(() => {});
 </script>
 </body>
