@@ -22,34 +22,37 @@
   .text-card p{font-size:0.75rem;color:#64748b;}
   
   .practice-screen{display:none;}
-  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:12px;padding:10px 16px;font-size:0.9rem;width:100%;}
+  .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:12px;padding:10px 16px;font-size:0.9rem;width:100%;border:none;border-radius:40px;cursor:pointer;}
   
   .card{background:white;border-radius:24px;padding:16px;margin-bottom:16px;}
   .text-header{margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e2e8f0;}
   .text-header h3{color:#0d6e6e;font-size:1rem;}
   
   .sentence-box{background:#e6f4f1;border-left:4px solid #0d6e6e;padding:16px;border-radius:16px;margin-bottom:16px;}
-  .sentence-text{font-size:1rem;font-weight:500;line-height:1.4;color:#1a2e2a;word-break:break-word;}
+  .sentence-text{font-size:1rem;font-weight:500;line-height:1.5;color:#1a2e2a;word-break:break-word;}
   
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;justify-content:center;}
-  button{background:#0d6e6e;border:none;padding:12px 20px;border-radius:40px;color:white;font-weight:600;font-size:0.85rem;cursor:pointer;min-width:100px;}
-  button:active{transform:scale(0.96);background:#0a5555;}
+  button{background:#0d6e6e;border:none;padding:12px 20px;border-radius:40px;color:white;font-weight:600;font-size:0.85rem;cursor:pointer;min-width:100px;transition:all 0.2s;}
+  button:active{transform:scale(0.96);}
   button.outline{background:transparent;border:2px solid #0d6e6e;color:#0d6e6e;}
   button.danger{background:#e74c3c;}
   button.success{background:#27ae60;}
-  button:disabled{opacity:0.5;transform:none;}
+  button:disabled{opacity:0.5;transform:none;cursor:not-allowed;}
+  button.recording{background:#e74c3c;animation:pulse 1s infinite;}
   
   .visualizer{background:#1a1a2e;border-radius:20px;padding:15px;margin:12px 0;text-align:center;}
-  canvas{width:100%;height:60px;background:#0f0f1a;border-radius:12px;}
-  .status{margin-top:8px;font-size:0.8rem;font-weight:500;}
+  canvas{width:100%;height:60px;background:#0f0f1a;border-radius:12px;display:block;}
+  .status{margin-top:8px;font-size:0.8rem;font-weight:500;color:#94a3b8;}
   .status.listening{color:#e74c3c;animation:pulse 1s infinite;}
+  .status.success{color:#27ae60;}
+  
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
   
-  .progress-bar{height:8px;background:#e0e0e0;border-radius:10px;margin:12px 0;}
-  .progress-fill{height:100%;background:#0d6e6e;width:0%;border-radius:10px;transition:width 0.3s;}
-  .progress-stats{display:flex;justify-content:space-between;font-size:0.7rem;margin-top:5px;}
+  .progress-bar{height:8px;background:#e0e0e0;border-radius:10px;margin:12px 0;overflow:hidden;}
+  .progress-fill{height:100%;background:#0d6e6e;width:0%;border-radius:10px;transition:width 0.5s;}
+  .progress-stats{display:flex;justify-content:space-between;font-size:0.7rem;color:#64748b;}
   
-  .feedback{margin-top:12px;padding:12px;border-radius:16px;font-size:0.85rem;line-height:1.4;}
+  .feedback{margin-top:12px;padding:12px;border-radius:16px;font-size:0.85rem;line-height:1.4;min-height:50px;}
   .feedback-success{background:#d4edda;border-left:4px solid #27ae60;color:#155724;}
   .feedback-error{background:#f8d7da;border-left:4px solid #e74c3c;color:#721c24;}
   .feedback-warning{background:#fff3cd;border-left:4px solid #f5a623;color:#856404;}
@@ -57,6 +60,10 @@
   
   .mic-status{background:#e8f5e9;border-radius:12px;padding:8px;margin-bottom:12px;text-align:center;font-size:0.75rem;color:#2e7d32;}
   .mic-status.error{background:#ffebee;color:#c62828;}
+  .mic-status.waiting{background:#fff3cd;color:#856404;}
+  
+  .compat-warning{background:#ffe0b2;border-radius:12px;padding:10px;margin-bottom:12px;font-size:0.75rem;color:#e65100;text-align:center;display:none;}
+  .compat-warning.show{display:block;}
   
   @media(min-width:600px){
     body{padding:20px;}
@@ -81,7 +88,8 @@
     <div class="card">
       <div id="textHeader" class="text-header"></div>
       
-      <div id="micStatus" class="mic-status">🎤 Appuyez sur "Parler" pour activer le micro</div>
+      <div id="micStatus" class="mic-status waiting">🎤 Appuyez sur "Parler" pour activer le micro</div>
+      <div id="compatWarning" class="compat-warning"></div>
       
       <div class="controls">
         <button id="playBtn">🔊 Écouter</button>
@@ -113,90 +121,56 @@
 </div>
 
 <script>
-  // ========== TEXTES COMPLETS (originaux) ==========
+  // ========== TEXTES COMPLETS (ORIGINAUX) ==========
   const textsData = {
     entrepreneurship: {
       title: "ENTREPRENEURSHIP",
-      fullText: ` 
-Entrepreneurship is the ability and readiness to develop, organize and run a business enterprise, along with any of its uncertainties in order to make a profit. The most prominent example of entr[...]
-In economics, entrepreneurship connected with land, labour, natural ressources and capital can generate a profit. The entrepreneurial vision is defined by discovery and risk-taking and is an indi[...]
+      fullText: `Entrepreneurship is the ability and readiness to develop, organize and run a business enterprise, along with any of its uncertainties in order to make a profit. The most prominent example of entrepreneurship is the starting of new businesses.
+In economics, entrepreneurship connected with land, labour, natural ressources and capital can generate a profit. The entrepreneurial vision is defined by discovery and risk-taking and is an indispensable part of a nation's capacity to succeed in an ever-changing and more competitive global marketplace.
 Entrepreurship can be classified into small or home business to multinational companies.
-Small Business Entrepreneurship-
-These businesses are a hairdresser, grocery store, travel agent, consultant, carpenter, plumber, electrician, etc. These people run or own their own business and hire family members or local empl[...]
-Scalable Startup Entrepreneurship-
-It starts up a business knowing that their vision can change the world. They attract investors who think and encourage people who think out of the box. The research focuses on a scalable business[...]
-Large Company Entrepreneurship-
-These huge companies have defined life-cycle. Most of them grow and sustain by offering new and innovative products that revolve around their main products. The change in technology, customer pre[...]
-Social Entreperneurship-
-This type of entrepreneurship focuses on producing product and services that resolve social needs and problems. Their only motto and goal is to work for society and not make any profits.
-
+Small Business Entrepreneurship- These businesses are a hairdresser, grocery store, travel agent, consultant, carpenter, plumber, electrician, etc. These people run or own their own business and hire family members or local employee. For them, the profit would be able to feed their family and not making 100 million businesses or taking over an industry. They fund their business by taking small business loans or loans from friends and family.
+Scalable Startup Entrepreneurship- It starts up a business knowing that their vision can change the world. They attract investors who think and encourage people who think out of the box. The research focuses on a scalable business and experimental models; so,they hire the best and the brightest employees. They require more venture capital to fuel and back their projet or business.
+Large Company Entrepreneurship- These huge companies have defined life-cycle. Most of them grow and sustain by offering new and innovative products that revolve around their main products. The change in technology, customer preferences, new competition, etc., build pressure for large companies to create an innovative product and sell it to the new set of customers in the new market. To cope with the rapid technological changes, the existing organisations either buy innovation enterprises or attempt to construct the product internally.
+Social Entreperneurship- This type of entrepreneurship focuses on producing product and services that resolve social needs and problems. Their only motto and goal is to work for society and not make any profits.
 Adapted from jus.com/entrepreneurship on Friday, September 2nd, 2022`
     },
     fitness: {
       title: "THE IMPORTANCE OF PHYSICAL FITNESS",
-      fullText: `
-To put it simply, physical activity and exercise is important for everyone. Children, adolescents, and adults of all ages need regular physical activity. Physical activity promotes good health, a[...]
-Understanding the benefits of physical fitness and knowing how active you should be can help you maintain good health and improve your overall quality of life. Here are a few benefits of regular [...]
-According to the Centers for Disease Control and Prevention, chronic diseases cause 7 out of 10 deaths in the U.S., and treating chronic diseases accounts for 86% of U.S. healthcare costs. While [...]
-Numerous studies have shown that regular physical activity increases life expectancy and reduces the risk of premature mortality. But research suggests that people who are more active tend to be [...]
-Regular exercise and physical activity increase muscle strength, bone density, flexibility, and stability. Physical fitness can reduce your risk for and resilience to accidental injuries, especia[...]
-A sedentary lifestyle and a lack of physical activity can take a toll on a person's body. Exercise, however, has been shown to improve mood and mental health, and provides numerous health benef[...]
-Staying active and healthy allows us to do activities that require a certain level of physical fitness. For example, hiking to the top of a mountain is a rewarding experience that instills a sens[...]
-
-Adapted by Mikolongo English Teachers from www. mana.md, October 20th,2024
-`
+      fullText: `To put it simply, physical activity and exercise is important for everyone. Children, adolescents, and adults of all ages need regular physical activity. Physical activity promotes good health, and you should stay active throughout all stages of your life regardless of your body type.
+Understanding the benefits of physical fitness and knowing how active you should be can help you maintain good health and improve your overall quality of life. Here are a few benefits of regular physical activity that demonstrate the importance of physical fitness.
+According to the Centers for Disease Control and Prevention, chronic diseases cause 7 out of 10 deaths in the U.S., and treating chronic diseases accounts for 86% of U.S. healthcare costs. While some diseases cannot be prevented, you can reduce your risk for certain disease – such as heart disease and diabetes – through reducing risky behaviors and living a healthy lifestyle.
+Numerous studies have shown that regular physical activity increases life expectancy and reduces the risk of premature mortality. But research suggests that people who are more active tend to be healthier and tend to live longer.
+Regular exercise and physical activity increase muscle strength, bone density, flexibility, and stability. Physical fitness can reduce your risk for and resilience to accidental injuries, especially as you get older. For example, stronger muscles and better balance mean that you're less likely to slip and fall.
+A sedentary lifestyle and a lack of physical activity can take a toll on a person's body. Exercise, however, has been shown to improve mood and mental health, and provides numerous health benefits.
+Staying active and healthy allows us to do activities that require a certain level of physical fitness. For example, hiking to the top of a mountain is a rewarding experience that instills a sense of accomplishment and provides spectacular scenery, but there are people who cannot experience this due to fitness limitations.
+Adapted by Mikolongo English Teachers from www.mana.md, October 20th, 2024`
     },
     exports: {
       title: "EXPORTS AND IMPORTS",
-      fullText: `Exports and imports play an important role in determining the overall health of an economy. In fact, Exports are the goods and services a country produces domestically and sells [...]
-Usually companies export goods or services in areas where they have a competitive advantage over other companies because their product or service is superior. They may also export commodities the[...]
-Whereas Imports are the goods and services a business or customer purchases from another country. While most countries try to export more goods and services than they import to increase their dom[...]
- For example, a paper manufacturing company in the United States may choose to import a new machine from Italy because it is more cost effective than building the machine themselves or purchasing[...]
-Exports and imports are important because together they make up a country's balance of trade, which can impact an economys's overall health. In a healty economy, both imports and exports see [...]
-A trade surplus occurs when a country's exports are greater than its imports. This means that there is a net inflow of domestic currency from foreign markets A trade deficit occurs when a country[...]
-Adapted from www.onestopenglish.com,  August 16th , 2024.`
+      fullText: `Exports and imports play an important role in determining the overall health of an economy. In fact, Exports are the goods and services a country produces domestically and sells to businesses or customers who reside in a foreign country.
+Usually companies export goods or services in areas where they have a competitive advantage over other companies because their product or service is superior. They may also export commodities they produce naturally that other countries lack based on climate and geography. For example, Jamaica, Kenya and Columbia all have a climate suitable for growing coffee. This helps fuel their ability to export this product to foreign countries that can't produce coffee in their region.
+Whereas Imports are the goods and services a business or customer purchases from another country. While most countries try to export more goods and services than they import to increase their domestic revenue, a high level of imports can indicate a growing economy. This is especially true if the imports are mainly productive assets, such as equipment and machinery, since the receiving country can use these assets to improve their economy's productivity.
+For example, a paper manufacturing company in the United States may choose to import a new machine from Italy because it is more cost effective than building the machine themselves or purchasing it from a domestic supplier. Once manufacturers install the machine, it may increase the manufacturing company's ability to produce paper products, thus increasing their revenue and ability to export more of their goods in the future.
+Exports and imports are important because together they make up a country's balance of trade, which can impact an economy's overall health. In a healthy economy, both imports and exports see continual growth. This usually represents a sustainable and strong economy. When they become unbalanced, it can cause either a trade surplus or a trade deficit.
+A trade surplus occurs when a country's exports are greater than its imports. This means that there is a net inflow of domestic currency from foreign markets. A trade deficit occurs when a country's imports are greater than its exports. This means that there is a net outflow of domestic currency to foreign markets. It can occur when a country lacks for example of the capacity to produce its own products.
+Adapted from www.onestopenglish.com, August 16th, 2024.`
     },
     ai: {
-      title: "ARTIFICIAL INTELLIGENCE",
-      fullText: `Artificial intelligence (AI) is a rapidly evolving technology in recent years. It has the 
-potential to transform the world in several aspects of society, across all sectors of 
-industries and governments. According to Russell S. J. and Norvig P., Artificial 
-intelligence (AI) is a field of computer science focused mainly on creating a machine or a 
-program that performs the tasks that typically require human intelligence. For example, 
-machine learning, problem-solving, decision-making, understanding languages, natural 
-language processing, automated reasoning, and carrying out tasks equal to humans. 
-In today's world, AI has been used in numerous applications such as medical 
-diagnosis, autonomous cars, home automation, social media, chatbots, virtual 
-assistance, financial analysis, and there are many more. Recent studies and 
-developments show AI has the potential to increase economic growth through improved 
-labour productivity, reduced resource consumption, accelerate innovations across 
-sectors and touch human lives in many aspects for the better good. In education, AI can 
-be used to personalize learning and improve educational outcomes for students.  
-On the other hand, AI can also lead to job displacement and increase the risk of 
-economic inequality. The ethical implications of AI range from issues surrounding bias, 
-privacy & security, and accountability to transparency, explainability, and human rights. 
-The use of AI in social media platforms can lead to the spread of misinformation and fake 
-news, undermining democratic processes and social cohesion. It can also raise privacy 
-concerns as it can collect vast amounts of personal data without consent. 
-In conclusion, the global impact of artificial intelligence is a multifaceted and 
-complex topic that requires devotion from various stakeholders from both private and 
-government institutions. To fully realize the benefits of AI and mitigate its risks, a 
-collaboration between government, industry, and academia is essential. Public 
-engagement and education are also critical to promote awareness and understanding of 
-AI's impact on society. 
-Chandregowda (Chandra) & Pachegowda, A Review. Department of Professional Security 
-Studies, New Jersey City University. January 2024
-    `
+      title: "THE GLOBAL IMPACT OF ARTIFICIAL INTELLIGENCE",
+      fullText: `Artificial intelligence (AI) is a rapidly evolving technology in recent years. It has the potential to transform the world in several aspects of society, across all sectors of industries and governments. According to Russell S. J. and Norvig P., Artificial intelligence (AI) is a field of computer science focused mainly on creating a machine or a program that performs the tasks that typically require human intelligence. For example, machine learning, problem-solving, decision-making, understanding languages, natural language processing, automated reasoning, and carrying out tasks equal to humans.
+In today's world, AI has been used in numerous applications such as medical diagnosis, autonomous cars, home automation, social media, chatbots, virtual assistance, financial analysis, and there are many more. Recent studies and developments show AI has the potential to increase economic growth through improved labour productivity, reduced resource consumption, accelerate innovations across sectors and touch human lives in many aspects for the better good. In education, AI can be used to personalize learning and improve educational outcomes for students.
+On the other hand, AI can also lead to job displacement and increase the risk of economic inequality. The ethical implications of AI range from issues surrounding bias, privacy and security, and accountability to transparency, explainability, and human rights. The use of AI in social media platforms can lead to the spread of misinformation and fake news, undermining democratic processes and social cohesion. It can also raise privacy concerns as it can collect vast amounts of personal data without consent.
+In conclusion, the global impact of artificial intelligence is a multifaceted and complex topic that requires devotion from various stakeholders from both private and government institutions. To fully realize the benefits of AI and mitigate its risks, a collaboration between government, industry, and academia is essential. Public engagement and education are also critical to promote awareness and understanding of AI's impact on society.
+Chandregowda (Chandra) & Pachegowda, A Review. Department of Professional Security Studies, New Jersey City University. January 2024`
     },
     malaria: {
       title: "MALARIA",
-      fullText: `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasm[...]
- The symptoms of malaria remain undetectable for the first few days after the bite. The first signs appear 9 to 30 days after the infection, depending on the species of Plasmodium involved. For t[...]
- Malaria disease and associated symptoms can be classified as "simple" or "complicated". The disease is said to be simple when it manifests as a flu-like illness. The patient suffers from[...]
-Prevention is essential in the fight against malaria in Africa because it can be very effective. In the first instance, it can be achieved by taking environmental measures: sanitation of wetlands[...]
-For people who do not live in a malaria-affected area but are expected to travel for vacation or business purposes, for example, preventive treatment is strongly advised, especially for children [...]
- 
-Adapted by Zilpah Sheikh from medical newstoday. com, july 3, 2025.`
+      fullText: `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites : they vary according to the geographical area affected and cause different symptoms : plasmodium falciparum, plasmodium vivax, plasmodium ovale, plasmodium malariae , plasmodium knowlesi.
+The symptoms of malaria remain undetectable for the first few days after the bite. The first signs appear 9 to 30 days after the infection, depending on the species of Plasmodium involved. For the most common species (Plasmodium Falciparum), the incubation period is usually 9 to 14 days.
+Malaria disease and associated symptoms can be classified as "simple" or "complicated". The disease is said to be simple when it manifests as a flu-like illness. The patient suffers from fever, headache, chills and muscles pain. And it is complicated or severe when the parasite reaches a vital organ. This form can appear in the case of infection by plasmodium falciparum and plasmodium vivax. The high number of deaths is mainly due to delayed or inadequate treatment. In order to significantly reduce the mortality of the disease, treatment is necessary from the first symptoms.
+Prevention is essential in the fight against malaria in Africa because it can be very effective. In the first instance, it can be achieved by taking environmental measures: sanitation of wetlands, spraying of mosquito repellents in affected areas and protection of homes with mosquito nets.
+For people who do not live in a malaria-affected area but are expected to travel for vacation or business purposes, for example, preventive treatment is strongly advised, especially for children and pregnant women who are at increased risk of developing severe malaria. This preventive treatment is prescribed by a doctor who takes into account the areas visited, the duration of the trip but also the age of the person, his or her medical history, a potential pregnancy, etc. Nevertheless, anti-malarial drugs cannot guarantee total protection against infection, so it is essential to continue to protect oneself from mosquito bites (repellents, mosquito nets, covering clothing), even when taking preventive treatment. For populations living in areas where malaria is prevalent, it is not recommended to take preventive treatment. Therefore, prevention should be based on the environmental and individual measures mentioned above.
+Adapted by Zilpah Sheikh from medicalnewstoday.com, July 3, 2025.`
     },
     deforestation: {
       title: "DEFORESTATION",
@@ -210,29 +184,36 @@ Adapted from www.wikipedia.com on 10 January 2025`
     }
   };
 
-  // Découpage en phrases (max 100 caractères pour meilleure reconnaissance)
+  // ========== DÉCOUPAGE AMÉLIORÉ ==========
   function splitIntoSentences(text, maxLen=100) {
-    let sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    // Nettoyer le texte des retours à la ligne multiples
+    let clean = text.replace(/\s+/g, ' ').trim();
+    // D'abord séparer par points, points d'exclamation, points d'interrogation
+    let sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
     let result = [];
     for (let s of sentences) {
       s = s.trim();
+      if (s.length === 0) continue;
       if (s.length <= maxLen) {
         result.push(s);
       } else {
-        let words = s.split(' ');
+        // Découpage par virgules pour les longues phrases
+        let parts = s.split(/[,;:]/);
         let current = '';
-        for (let w of words) {
-          if ((current + ' ' + w).length <= maxLen) {
-            current = current ? current + ' ' + w : w;
+        for (let p of parts) {
+          p = p.trim();
+          if (current.length + p.length + 2 <= maxLen) {
+            current = current ? current + ', ' + p : p;
           } else {
             if (current) result.push(current + '.');
-            current = w;
+            current = p;
           }
         }
         if (current) result.push(current + '.');
       }
     }
-    return result;
+    // Filtrer les segments trop courts
+    return result.filter(s => s.length > 15);
   }
 
   let currentTextId = null;
@@ -244,8 +225,9 @@ Adapted from www.wikipedia.com on 10 January 2025`
   let recognition = null;
   let canvas = document.getElementById('voiceCanvas');
   let ctx = canvas.getContext('2d');
+  let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-  // Éléments DOM
+  // DOM
   const homeScreen = document.getElementById('homeScreen');
   const practiceScreen = document.getElementById('practiceScreen');
   const textGrid = document.getElementById('textGrid');
@@ -261,6 +243,7 @@ Adapted from www.wikipedia.com on 10 January 2025`
   const progressFill = document.getElementById('progressFill');
   const progressText = document.getElementById('progressText');
   const micStatus = document.getElementById('micStatus');
+  const compatWarning = document.getElementById('compatWarning');
 
   function resizeCanvas() {
     canvas.width = Math.min(canvas.parentElement.clientWidth - 30, 400);
@@ -273,9 +256,13 @@ Adapted from www.wikipedia.com on 10 January 2025`
   
   function loadProgress() {
     let saved = localStorage.getItem(getStorageKey());
-    if (saved) progress = JSON.parse(saved);
-    else progress = new Array(sentences.length).fill(false);
-    while (progress.length < sentences.length) progress.push(false);
+    if (saved) {
+      progress = JSON.parse(saved);
+      if (progress.length > sentences.length) progress = progress.slice(0, sentences.length);
+      while (progress.length < sentences.length) progress.push(false);
+    } else {
+      progress = new Array(sentences.length).fill(false);
+    }
     currentIndex = 0;
     updateUI();
   }
@@ -286,11 +273,14 @@ Adapted from www.wikipedia.com on 10 January 2025`
   }
   
   function updateUI() {
+    if (sentences.length === 0) return;
     let done = progress.filter(v=>v===true).length;
     let percent = Math.round((done/sentences.length)*100);
     progressFill.style.width = percent+'%';
     progressText.innerText = `${done}/${sentences.length} (${percent}%)`;
-    sentenceEl.innerText = sentences[currentIndex];
+    if (sentences[currentIndex]) {
+      sentenceEl.innerText = sentences[currentIndex];
+    }
     nextBtn.disabled = !progress[currentIndex];
     if (progress[currentIndex]) nextBtn.classList.add('success');
     else nextBtn.classList.remove('success');
@@ -315,29 +305,35 @@ Adapted from www.wikipedia.com on 10 January 2025`
     
     feedbackDiv.innerHTML = msg;
     feedbackDiv.className = `feedback ${className}`;
-    setTimeout(() => {
-      if (feedbackDiv.innerHTML === msg) {
-        feedbackDiv.innerHTML = '💡 Appuyez sur "Parler" pour continuer';
-        feedbackDiv.className = 'feedback feedback-info';
-      }
-    }, 4000);
   }
 
-  // Lecture audio (nécessite une interaction utilisateur)
+  // ========== SYNTHÈSE VOCALE ==========
   function speak(text, onEnd) {
     if (!window.speechSynthesis) {
-      showFeedback("Lecture non disponible sur ce navigateur", "error");
+      showFeedback("Lecture non disponible", "error");
       return;
     }
-    let utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.85;
-    utterance.onend = () => { if(onEnd) onEnd(); };
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+    try {
+      let utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.85;
+      utterance.onend = () => { 
+        if (typeof onEnd === 'function') onEnd(); 
+      };
+      utterance.onerror = () => {
+        if (typeof onEnd === 'function') onEnd();
+      };
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    } catch(e) {
+      console.error("Speech error:", e);
+      showFeedback("Erreur de lecture", "error");
+      if (typeof onEnd === 'function') onEnd();
+    }
   }
 
   function playCurrent() {
+    if (!sentences[currentIndex]) return;
     speak(sentences[currentIndex]);
     showFeedback(`🔊 Écoute - ${currentIndex+1}/${sentences.length}`, 'info');
   }
@@ -355,10 +351,10 @@ Adapted from www.wikipedia.com on 10 January 2025`
       gain.gain.exponentialRampToValueAtTime(0.00001, ac.currentTime + 0.3);
       osc.stop(ac.currentTime + 0.3);
       setTimeout(() => ac.close(), 400);
-    } catch(e) {}
+    } catch(e) { console.log("Beep skipped"); }
   }
 
-  // Animation de visualisation
+  // ========== VISUALISATION ==========
   function startVisualization() {
     if (animationId) cancelAnimationFrame(animationId);
     let time = 0;
@@ -373,8 +369,9 @@ Adapted from www.wikipedia.com on 10 January 2025`
       ctx.beginPath();
       ctx.strokeStyle = '#0d6e6e';
       ctx.lineWidth = 2;
+      let amp = 15 + Math.sin(time * 0.5) * 5;
       for (let x = 0; x < canvas.width; x += 5) {
-        let y = canvas.height/2 + Math.sin(x * 0.03 + time) * 15;
+        let y = canvas.height/2 + Math.sin(x * 0.04 + time) * amp;
         if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
@@ -392,46 +389,67 @@ Adapted from www.wikipedia.com on 10 January 2025`
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Calcul de similarité
+  // ========== SIMILARITÉ ==========
   function calculateSimilarity(spoken, target) {
     let a = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
     let b = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
     if (a === b) return 1;
     if (a.length === 0 || b.length === 0) return 0;
+    
     let wordsA = a.split(/\s+/);
     let wordsB = b.split(/\s+/);
+    
+    let lengthDiff = Math.abs(wordsA.length - wordsB.length);
+    let lengthPenalty = Math.max(0, 1 - (lengthDiff / Math.max(wordsA.length, wordsB.length)));
+    
     let matches = 0;
     for (let wa of wordsA) {
+      let bestMatch = 0;
       for (let wb of wordsB) {
-        if (wb === wa || wa.includes(wb) || wb.includes(wa) || 
-            (wa.length > 4 && wb.length > 4 && wa[0] === wb[0] && wa[wa.length-1] === wb[wb.length-1])) {
-          matches++;
-          break;
+        if (wb === wa) { bestMatch = 1; break; }
+        if (wa.includes(wb) && wa.length > 3) bestMatch = Math.max(bestMatch, 0.85);
+        if (wb.includes(wa) && wb.length > 3) bestMatch = Math.max(bestMatch, 0.85);
+        if (wa.length > 4 && wb.length > 4) {
+          if (wa[0] === wb[0] && wa[wa.length-1] === wb[wb.length-1]) {
+            bestMatch = Math.max(bestMatch, 0.6);
+          }
         }
       }
+      matches += bestMatch;
     }
-    return matches / Math.max(wordsA.length, wordsB.length);
+    
+    let ratio = (matches / Math.max(wordsA.length, wordsB.length)) * lengthPenalty;
+    return Math.min(ratio + 0.1, 1);
   }
 
-  // Reconnaissance vocale
+  // ========== RECONNAISSANCE VOCALE ==========
   function startListening() {
-    if (!window.webkitSpeechRecognition && !window.SpeechRecognition) {
-      showFeedback("Reconnaissance vocale non supportée. Utilisez Chrome sur Android", "error");
+    const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecog) {
+      showFeedback("Reconnaissance vocale non supportée", "error");
+      compatWarning.classList.add('show');
       return;
     }
     
-    const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (recognition) {
+      try { recognition.stop(); } catch(e) {}
+      recognition = null;
+    }
+    
     recognition = new SpeechRecog();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
+    recognition.continuous = false;
 
     recognition.onstart = () => {
       isListening = true;
-      voiceStatus.innerHTML = '🎤🔴 Écoute... Parlez';
+      voiceStatus.innerHTML = '🎤🔴 Écoute...';
       voiceStatus.className = 'status listening';
+      repeatBtn.textContent = '⏹️ Arrêter';
+      repeatBtn.style.background = '#e74c3c';
       startVisualization();
-      micStatus.innerHTML = '🎤 Micro actif - Parlez maintenant';
+      micStatus.innerHTML = '🎤 Parlez maintenant...';
       micStatus.className = 'mic-status';
     };
 
@@ -442,13 +460,15 @@ Adapted from www.wikipedia.com on 10 January 2025`
 
     recognition.onerror = (event) => {
       if (event.error === 'not-allowed') {
-        micStatus.innerHTML = '🎤❌ Micro non autorisé. Vérifiez les permissions';
+        micStatus.innerHTML = '🎤❌ Micro non autorisé';
         micStatus.className = 'mic-status error';
-        showFeedback("Autorisez l'accès au microphone dans les paramètres", "error");
+        showFeedback("Autorisez l'accès au microphone", "error");
       } else if (event.error === 'no-speech') {
         showFeedback("Aucun son détecté. Parlez plus fort", "warning");
+      } else if (event.error === 'audio-capture') {
+        showFeedback("Microphone non trouvé", "error");
       } else {
-        showFeedback(`Erreur: ${event.error}. Réessayez`, "error");
+        showFeedback(`Erreur: ${event.error}`, "error");
       }
       stopListening();
     };
@@ -457,6 +477,8 @@ Adapted from www.wikipedia.com on 10 January 2025`
       stopListening();
       voiceStatus.innerHTML = '⚪ Prêt';
       voiceStatus.className = '';
+      repeatBtn.textContent = '🎤 Parler';
+      repeatBtn.style.background = '#f5a623';
     };
 
     try {
@@ -468,26 +490,35 @@ Adapted from www.wikipedia.com on 10 January 2025`
       }, 8000);
     } catch(e) {
       showFeedback("Appuyez à nouveau sur Parler", "warning");
+      repeatBtn.textContent = '🎤 Parler';
+      repeatBtn.style.background = '#f5a623';
     }
   }
 
   function stopListening() {
     isListening = false;
-    stopVisualization();
     if (recognition) {
       try { recognition.stop(); } catch(e) {}
+      recognition = null;
     }
+    stopVisualization();
+    voiceStatus.innerHTML = '⚪ Prêt';
+    voiceStatus.className = '';
+    repeatBtn.textContent = '🎤 Parler';
+    repeatBtn.style.background = '#f5a623';
   }
 
   function evaluate(spoken) {
+    if (!sentences[currentIndex]) return;
     const target = sentences[currentIndex];
     const sim = calculateSimilarity(spoken, target);
     const percent = Math.round(sim * 100);
     
     voiceStatus.innerHTML = `🎤✅ ${percent}%`;
+    voiceStatus.className = 'status success';
     
     if (sim >= 0.65) {
-      showFeedback(`✅ Excellent ! ${percent}% - "${spoken.substring(0, 50)}"`, 'success');
+      showFeedback(`✅ Excellent ! ${percent}%`, 'success');
       const validated = markCurrentDone();
       if (validated && currentIndex + 1 < sentences.length) {
         setTimeout(() => {
@@ -500,19 +531,29 @@ Adapted from www.wikipedia.com on 10 January 2025`
         setTimeout(() => showFeedback("🏆 Félicitations ! Texte terminé !", "success"), 1500);
       }
     } else if (sim >= 0.45) {
-      showFeedback(`👍 ${percent}% - "${spoken.substring(0, 50)}" → encore un effort`, 'warning');
+      showFeedback(`👍 ${percent}% - Encore un effort`, 'warning');
     } else {
       showFeedback(`📚 ${percent}% - Réécoutez et réessayez`, 'error');
     }
   }
 
+  // ========== SÉQUENCE COMPLÈTE ==========
   function repeatSequence() {
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    
+    if (!sentences[currentIndex]) return;
+    
     showFeedback("🔊 Écoutez...", "info");
     speak(sentences[currentIndex], () => {
-      playBeep();
-      showFeedback("🎤 Parlez maintenant", "warning");
       setTimeout(() => {
-        startListening();
+        playBeep();
+        showFeedback("🎤 Parlez maintenant", "warning");
+        setTimeout(() => {
+          startListening();
+        }, 300);
       }, 300);
     });
   }
@@ -545,13 +586,18 @@ Adapted from www.wikipedia.com on 10 January 2025`
   function loadText(textId) {
     currentTextId = textId;
     const data = textsData[textId];
+    if (!data) return;
     sentences = splitIntoSentences(data.fullText, 100);
+    if (sentences.length === 0) {
+      sentences = [data.fullText.substring(0, 100) + '...'];
+    }
     textHeader.innerHTML = `<h3>📖 ${data.title}</h3>`;
     loadProgress();
     resizeCanvas();
     homeScreen.style.display = 'none';
     practiceScreen.style.display = 'block';
-    if (recognition) try { recognition.stop(); } catch(e) {}
+    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    stopListening();
   }
 
   function buildHomeScreen() {
@@ -565,7 +611,7 @@ Adapted from www.wikipedia.com on 10 January 2025`
     }
   }
 
-  // Événements
+  // ========== ÉVÉNEMENTS ==========
   playBtn.onclick = playCurrent;
   repeatBtn.onclick = repeatSequence;
   nextBtn.onclick = nextSegment;
@@ -573,8 +619,28 @@ Adapted from www.wikipedia.com on 10 January 2025`
   backToHomeBtn.onclick = () => {
     homeScreen.style.display = 'block';
     practiceScreen.style.display = 'none';
+    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    stopListening();
   };
 
+  // Raccourcis clavier
+  document.addEventListener('keydown', (e) => {
+    if (practiceScreen.style.display !== 'block') return;
+    if (e.key === ' ' || e.key === 'Space') {
+      e.preventDefault();
+      playCurrent();
+    }
+    if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      repeatSequence();
+    }
+    if (e.key === 'n' || e.key === 'N') {
+      e.preventDefault();
+      nextSegment();
+    }
+  });
+
+  // ========== INITIALISATION ==========
   buildHomeScreen();
   resizeCanvas();
 </script>
