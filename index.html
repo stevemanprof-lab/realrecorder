@@ -20,6 +20,7 @@
   .text-card:active{background:#e6f4f1;transform:scale(0.98);}
   .text-card h3{color:#0d6e6e;margin-bottom:5px;font-size:1rem;}
   .text-card p{font-size:0.75rem;color:#64748b;}
+  .text-card .text-tag{display:inline-block;background:#0d6e6e;color:white;padding:2px 10px;border-radius:12px;font-size:0.6rem;margin-top:5px;}
   
   .practice-screen{display:none;}
   .back-btn{background:#e2e8f0;color:#1e293b;margin-bottom:12px;padding:10px 16px;font-size:0.9rem;width:100%;border:none;border-radius:40px;cursor:pointer;}
@@ -121,10 +122,12 @@
 </div>
 
 <script>
-  // ========== TEXTES COMPLETS (ORIGINAUX) ==========
+  // ========== TOUS LES TEXTES COMPLETS ==========
   const textsData = {
+    // --- TEXTES PRÉCÉDENTS ---
     entrepreneurship: {
       title: "ENTREPRENEURSHIP",
+      tag: "Économie",
       fullText: `Entrepreneurship is the ability and readiness to develop, organize and run a business enterprise, along with any of its uncertainties in order to make a profit. The most prominent example of entrepreneurship is the starting of new businesses.
 In economics, entrepreneurship connected with land, labour, natural ressources and capital can generate a profit. The entrepreneurial vision is defined by discovery and risk-taking and is an indispensable part of a nation's capacity to succeed in an ever-changing and more competitive global marketplace.
 Entrepreurship can be classified into small or home business to multinational companies.
@@ -136,6 +139,7 @@ Adapted from jus.com/entrepreneurship on Friday, September 2nd, 2022`
     },
     fitness: {
       title: "THE IMPORTANCE OF PHYSICAL FITNESS",
+      tag: "Santé",
       fullText: `To put it simply, physical activity and exercise is important for everyone. Children, adolescents, and adults of all ages need regular physical activity. Physical activity promotes good health, and you should stay active throughout all stages of your life regardless of your body type.
 Understanding the benefits of physical fitness and knowing how active you should be can help you maintain good health and improve your overall quality of life. Here are a few benefits of regular physical activity that demonstrate the importance of physical fitness.
 According to the Centers for Disease Control and Prevention, chronic diseases cause 7 out of 10 deaths in the U.S., and treating chronic diseases accounts for 86% of U.S. healthcare costs. While some diseases cannot be prevented, you can reduce your risk for certain disease – such as heart disease and diabetes – through reducing risky behaviors and living a healthy lifestyle.
@@ -147,6 +151,7 @@ Adapted by Mikolongo English Teachers from www.mana.md, October 20th, 2024`
     },
     exports: {
       title: "EXPORTS AND IMPORTS",
+      tag: "Économie",
       fullText: `Exports and imports play an important role in determining the overall health of an economy. In fact, Exports are the goods and services a country produces domestically and sells to businesses or customers who reside in a foreign country.
 Usually companies export goods or services in areas where they have a competitive advantage over other companies because their product or service is superior. They may also export commodities they produce naturally that other countries lack based on climate and geography. For example, Jamaica, Kenya and Columbia all have a climate suitable for growing coffee. This helps fuel their ability to export this product to foreign countries that can't produce coffee in their region.
 Whereas Imports are the goods and services a business or customer purchases from another country. While most countries try to export more goods and services than they import to increase their domestic revenue, a high level of imports can indicate a growing economy. This is especially true if the imports are mainly productive assets, such as equipment and machinery, since the receiving country can use these assets to improve their economy's productivity.
@@ -157,6 +162,7 @@ Adapted from www.onestopenglish.com, August 16th, 2024.`
     },
     ai: {
       title: "THE GLOBAL IMPACT OF ARTIFICIAL INTELLIGENCE",
+      tag: "Technologie",
       fullText: `Artificial intelligence (AI) is a rapidly evolving technology in recent years. It has the potential to transform the world in several aspects of society, across all sectors of industries and governments. According to Russell S. J. and Norvig P., Artificial intelligence (AI) is a field of computer science focused mainly on creating a machine or a program that performs the tasks that typically require human intelligence. For example, machine learning, problem-solving, decision-making, understanding languages, natural language processing, automated reasoning, and carrying out tasks equal to humans.
 In today's world, AI has been used in numerous applications such as medical diagnosis, autonomous cars, home automation, social media, chatbots, virtual assistance, financial analysis, and there are many more. Recent studies and developments show AI has the potential to increase economic growth through improved labour productivity, reduced resource consumption, accelerate innovations across sectors and touch human lives in many aspects for the better good. In education, AI can be used to personalize learning and improve educational outcomes for students.
 On the other hand, AI can also lead to job displacement and increase the risk of economic inequality. The ethical implications of AI range from issues surrounding bias, privacy and security, and accountability to transparency, explainability, and human rights. The use of AI in social media platforms can lead to the spread of misinformation and fake news, undermining democratic processes and social cohesion. It can also raise privacy concerns as it can collect vast amounts of personal data without consent.
@@ -165,6 +171,7 @@ Chandregowda (Chandra) & Pachegowda, A Review. Department of Professional Securi
     },
     malaria: {
       title: "MALARIA",
+      tag: "Santé",
       fullText: `Malaria is caused by a parasite of the genus plasmodium which is transmitted to humans through the bites of infected female Anopheles mosquitoes. There are several types of plasmodium parasites : they vary according to the geographical area affected and cause different symptoms : plasmodium falciparum, plasmodium vivax, plasmodium ovale, plasmodium malariae , plasmodium knowlesi.
 The symptoms of malaria remain undetectable for the first few days after the bite. The first signs appear 9 to 30 days after the infection, depending on the species of Plasmodium involved. For the most common species (Plasmodium Falciparum), the incubation period is usually 9 to 14 days.
 Malaria disease and associated symptoms can be classified as "simple" or "complicated". The disease is said to be simple when it manifests as a flu-like illness. The patient suffers from fever, headache, chills and muscles pain. And it is complicated or severe when the parasite reaches a vital organ. This form can appear in the case of infection by plasmodium falciparum and plasmodium vivax. The high number of deaths is mainly due to delayed or inadequate treatment. In order to significantly reduce the mortality of the disease, treatment is necessary from the first symptoms.
@@ -174,6 +181,7 @@ Adapted by Zilpah Sheikh from medicalnewstoday.com, July 3, 2025.`
     },
     deforestation: {
       title: "DEFORESTATION",
+      tag: "Environnement",
       fullText: `Deforestation or forest clearance is the removal and destruction of a forest or stand of trees from land that is then converted to non-forest use. Deforestation can involve conversion of forest land to farms, ranches, or urban use. About 31% of Earth's land surface is covered by forests at present. This is one-third less than the forest cover before the expansion of agriculture, with half of that loss occurring in the last century.
 The causes of deforestation are as varied as they are complex, often interwoven with economic, social, and political factors. One of the primary drivers is agricultural expansion, particularly in developing countries where forests are cleared to make way for crops and livestock. The demand for palm oil, soybeans, and beef has led to extensive land conversion, resulting in significant forest loss.
 Another significant factor contributing to deforestation is logging, both legal and illegal. The timber industry plays a crucial role in many economies, providing jobs and resources; however, unsustainable logging practices can lead to severe ecological damage. Furthermore, infrastructure development such as roads, dams, and urban expansion, often necessitates clearing large areas of forest.
@@ -181,14 +189,46 @@ The consequences of deforestation are profound and multifaceted, impacting not o
 Forests act as carbon sinks; when they are destroyed, not only is this carbon released, but the capacity for future carbon absorption is also diminished. This dual impact intensifies global warming and its associated effects, such as extreme weather events and rising sea levels. Thus, the consequences of deforestation extend far beyond the immediate loss of trees; they reverberate through ecosystems and human societies alike.
 By supporting sustainable forestry practices, consumers can play a pivotal role in reducing the demand for products linked to deforestation while promoting responsible land use. Another effective strategy involves reforestation and afforestation initiatives aimed at restoring degraded landscapes and expanding forest cover. Reforestation involves planting trees in areas where forests have been cut down or degraded, while afforestation refers to establishing forests in previously non-forested areas.
 Adapted from www.wikipedia.com on 10 January 2025`
+    },
+    // --- NOUVEAUX TEXTES ---
+    electric_circuits: {
+      title: "ELECTRIC CIRCUITS",
+      tag: "Sciences",
+      fullText: `Electric circuits are closed loops through which electrons flow, powered by an external source like a battery. The flow begins at the source and returns at the endpoint, completing the circuit. These circuits consist of active and passive components, such as resistors, capacitors, diodes, and transistors. In a closed-loop circuit, the current flows from the source through a load and back to the source via conducting wires.
+There are different types of electric circuits: series, parallel, open, and short circuits. A series circuit connects components in a single path, where the current is the same throughout. The total resistance in a series circuit is the sum of individual resistances, the total voltage is the sum of individual voltage drops, and the total current is constant.
+In contrast, a parallel circuit has multiple branches through which current divides. Although the current splits across branches, each component shares the same voltage. The key characteristic of a parallel connection is that all components are connected across each other's leads.
+An open circuit occurs when no current flows due to a break or disconnection in the circuit. In such cases, the circuit is incomplete, preventing the flow of current, though there may still be a voltage drop across the break. Conversely, a short circuit happens when there is a low-resistance connection, often caused by a faulty wire or component, leading to excessive current flow and potential damage to the circuit.
+A ground fault is a type of short circuit where the current unintentionally flows to the ground, bypassing the normal circuit path. A common short circuit occurs when a live wire touches a neutral wire, causing a sudden current surge.
+Electric circuits are essential to modern electronics, powering everything from simple devices to complex systems. Understanding circuit design and analysis is crucial for engineers and technicians in electronics and technology fields. While circuit technology evolves with new materials and applications, the core principles remain fundamental for anyone working with electronics.
+Adapted by Suresh Kambara, www.scitechnol.com, 7th February 2023.`
+    },
+    safety_equipment: {
+      title: "SAFETY EQUIPMENT AND USE",
+      tag: "Sécurité",
+      fullText: `Safety equipment is any device or tool that is designed to protect workers from injury or illness. There are many types of safety equipment available, and employers should choose the right equipment for the specific hazards workers face in their workplace. It refers to protective gear and tools that workers use to protect themselves from harm and prevent accidents while on the job. These items may include gloves, helmets, safety glasses, earplugs, high-visibility jackets, and respirators, among others.
+Wearing safety equipment is an essential requirement for performing high-risk tasks. In general, it is designed to either mitigate or manage risks associated with different activities. Here are just some of the reasons why it's so important to wear safety equipment.
+First, it prevents accidents from occurring. In industrial settings, workers are often exposed to hazards such as falling debris, chemical spills, and electrical shocks. Wearing the correct safety equipment can protect you from these dangers and prevent accidents from happening. For example, hard hats can shield you from falling objects, chemical-resistant gloves can protect your hands from hazardous substances.
+Second, even if an accident occurs, wearing safety equipment can significantly reduce the severity of any resulting injuries. For instance, a properly fitted respiratory mask can protect you from inhaling harmful gases, while steel-toed boots can prevent foot injuries from heavy machinery. In some cases, safety equipment may even save your life. For example, wearing a safety harness can prevent falls from heights, and fire-resistant clothing can protect you from flames and burns.
+Third, it ensures compliance with workplace regulations. Many industries, such as construction and mining, have strict safety requirements that must be met in order to ensure worker safety. By following these guidelines and wearing the necessary safety equipment, you can avoid costly fines and protect your company's reputation. Finally, it can have a positive impact on your workplace productivity. When workers feel safe and protected, they are more likely to focus on their tasks and work efficiently.
+Retrieved by Nafeez Khan, www.onestopenglish.com, September 23rd, 2024`
+    },
+    genetics: {
+      title: "GENETICS",
+      tag: "Sciences",
+      fullText: `Genetics is the study of heredity, or how certain features pass from parents to their offspring, or young. Every kind of plant and animal produces young of its own species, or type. The young resemble their parents. But offspring are not usually exactly the same as their parents. For example, their hair color or height may be different.
+Genes are the basic units of heredity. They carry information about a living thing, including its traits. Threadlike structures called chromosomes carry the genes. Each chromosome is made up mainly of a substance called deoxyribonucleic acid, or DNA. The genes are short sections of DNA.
+In human beings most cells have 23 pairs of chromosomes, or 46 in all. The sex cells, sperm cells and egg cells, each have only one set of 23 chromosomes. This is because of the way reproduction works. Every human baby begins as an egg cell from the mother. First, though, a sperm cell from the father must enter the egg. When this happens, the sperm's chromosomes unite with the chromosomes from the egg. Together they form 23 pairs of chromosomes.
+One pair of chromosomes in a baby causes it to be a boy or a girl. This pair consists of chromosomes labeled X or Y. Sperm cells have either an X or a Y chromosome. But an egg cell always has an X chromosome. Therefore, when a sperm unites with an egg, the new cell has either one X and one Y chromosome or two X chromosomes. A cell with one X and one Y chromosome produces a boy. A cell with two X chromosomes produces a girl.
+Some genes are dominant, or stronger than others. A child may get a gene for cheek dimples from the father and a gene for no cheek dimples from the mother. Because the cheek-dimple gene is dominant, it takes over the job of giving cheek dimples to the child.
+Children of the same parents can end up with different traits. This is because each parent carries two genes for every task but gives each child only one of these. The father, for example, may have one gene for cheek dimples and one gene for no cheek dimples.
+Sometimes a gene does not work as it should, or it works in a harmful way. The result may be a defect in a part of the body or a disease. A condition called albinism is an example. It occurs when the gene that controls the body's production of coloring substances does not work properly.
+Adapted by Mikolongo English Teachers from https://kids.britannica.com, November 18th 2024`
     }
   };
 
   // ========== DÉCOUPAGE EN PHRASES COURTES (max 60 caractères) ==========
   function splitIntoSentences(text, maxLen=60) {
-    // Nettoyer le texte des retours à la ligne multiples
     let clean = text.replace(/\s+/g, ' ').trim();
-    // D'abord séparer par points, points d'exclamation, points d'interrogation
     let sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
     let result = [];
     for (let s of sentences) {
@@ -197,7 +237,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
       if (s.length <= maxLen) {
         result.push(s);
       } else {
-        // Découpage par virgules ou points-virgules
         let parts = s.split(/[,;:]/);
         let current = '';
         for (let p of parts) {
@@ -206,7 +245,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
             current = current ? current + ', ' + p : p;
           } else {
             if (current) {
-              // S'assurer que la phrase se termine par un point
               if (!current.endsWith('.')) current += '.';
               result.push(current);
             }
@@ -219,7 +257,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
         }
       }
     }
-    // Filtrer les segments trop courts et ceux qui ne contiennent pas de mots
     return result.filter(s => s.length > 10 && s.match(/[a-zA-Z]/));
   }
 
@@ -258,7 +295,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
   }
   window.addEventListener('resize', resizeCanvas);
 
-  // Progression
   function getStorageKey() { return `voice_progress_${currentTextId}`; }
   
   function loadProgress() {
@@ -314,7 +350,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
     feedbackDiv.className = `feedback ${className}`;
   }
 
-  // ========== SYNTHÈSE VOCALE ==========
   function speak(text, onEnd) {
     if (!window.speechSynthesis) {
       showFeedback("Lecture non disponible", "error");
@@ -323,7 +358,7 @@ Adapted from www.wikipedia.com on 10 January 2025`
     try {
       let utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.rate = 0.8; // Légèrement plus lent pour une meilleure compréhension
+      utterance.rate = 0.8;
       utterance.onend = () => { 
         if (typeof onEnd === 'function') onEnd(); 
       };
@@ -361,7 +396,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
     } catch(e) { console.log("Beep skipped"); }
   }
 
-  // ========== VISUALISATION ==========
   function startVisualization() {
     if (animationId) cancelAnimationFrame(animationId);
     let time = 0;
@@ -396,7 +430,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // ========== SIMILARITÉ ==========
   function calculateSimilarity(spoken, target) {
     let a = spoken.toLowerCase().replace(/[^\w\s]/g, '').trim();
     let b = target.toLowerCase().replace(/[^\w\s]/g, '').trim();
@@ -429,7 +462,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
     return Math.min(ratio + 0.1, 1);
   }
 
-  // ========== RECONNAISSANCE VOCALE ==========
   function startListening() {
     const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecog) {
@@ -490,7 +522,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
 
     try {
       recognition.start();
-      // Timeout adapté : 15 secondes pour les phrases courtes (largement suffisant)
       setTimeout(() => {
         if (recognition && isListening) {
           try { recognition.stop(); } catch(e) {}
@@ -545,7 +576,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
     }
   }
 
-  // ========== SÉQUENCE COMPLÈTE ==========
   function repeatSequence() {
     if (isListening) {
       stopListening();
@@ -595,7 +625,7 @@ Adapted from www.wikipedia.com on 10 January 2025`
     currentTextId = textId;
     const data = textsData[textId];
     if (!data) return;
-    sentences = splitIntoSentences(data.fullText, 60); // 60 caractères max par phrase
+    sentences = splitIntoSentences(data.fullText, 60);
     if (sentences.length === 0) {
       sentences = [data.fullText.substring(0, 60) + '...'];
     }
@@ -613,10 +643,20 @@ Adapted from www.wikipedia.com on 10 January 2025`
     for (let [id, data] of Object.entries(textsData)) {
       let card = document.createElement('div');
       card.className = 'text-card';
-      card.innerHTML = `<h3>${data.title}</h3><p>Cliquez pour commencer</p>`;
+      card.innerHTML = `
+        <h3>${data.title}</h3>
+        <p>${data.tag || 'Lecture'}</p>
+        <span class="text-tag">🎤 ${sentencesInText(data.fullText)} phrases</span>
+      `;
       card.onclick = () => loadText(id);
       textGrid.appendChild(card);
     }
+  }
+
+  function sentencesInText(text) {
+    let clean = text.replace(/\s+/g, ' ').trim();
+    let sentences = clean.match(/[^.!?]+[.!?]+/g) || [text];
+    return sentences.length;
   }
 
   // ========== ÉVÉNEMENTS ==========
@@ -631,7 +671,6 @@ Adapted from www.wikipedia.com on 10 January 2025`
     stopListening();
   };
 
-  // Raccourcis clavier
   document.addEventListener('keydown', (e) => {
     if (practiceScreen.style.display !== 'block') return;
     if (e.key === ' ' || e.key === 'Space') {
