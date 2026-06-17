@@ -184,8 +184,8 @@ Adapted from www.wikipedia.com on 10 January 2025`
     }
   };
 
-  // ========== DÉCOUPAGE AMÉLIORÉ ==========
-  function splitIntoSentences(text, maxLen=100) {
+  // ========== DÉCOUPAGE EN PHRASES COURTES (max 60 caractères) ==========
+  function splitIntoSentences(text, maxLen=60) {
     // Nettoyer le texte des retours à la ligne multiples
     let clean = text.replace(/\s+/g, ' ').trim();
     // D'abord séparer par points, points d'exclamation, points d'interrogation
@@ -197,7 +197,7 @@ Adapted from www.wikipedia.com on 10 January 2025`
       if (s.length <= maxLen) {
         result.push(s);
       } else {
-        // Découpage par virgules pour les longues phrases
+        // Découpage par virgules ou points-virgules
         let parts = s.split(/[,;:]/);
         let current = '';
         for (let p of parts) {
@@ -205,15 +205,22 @@ Adapted from www.wikipedia.com on 10 January 2025`
           if (current.length + p.length + 2 <= maxLen) {
             current = current ? current + ', ' + p : p;
           } else {
-            if (current) result.push(current + '.');
+            if (current) {
+              // S'assurer que la phrase se termine par un point
+              if (!current.endsWith('.')) current += '.';
+              result.push(current);
+            }
             current = p;
           }
         }
-        if (current) result.push(current + '.');
+        if (current) {
+          if (!current.endsWith('.')) current += '.';
+          result.push(current);
+        }
       }
     }
-    // Filtrer les segments trop courts
-    return result.filter(s => s.length > 15);
+    // Filtrer les segments trop courts et ceux qui ne contiennent pas de mots
+    return result.filter(s => s.length > 10 && s.match(/[a-zA-Z]/));
   }
 
   let currentTextId = null;
@@ -316,7 +323,7 @@ Adapted from www.wikipedia.com on 10 January 2025`
     try {
       let utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.rate = 0.85;
+      utterance.rate = 0.8; // Légèrement plus lent pour une meilleure compréhension
       utterance.onend = () => { 
         if (typeof onEnd === 'function') onEnd(); 
       };
@@ -483,11 +490,12 @@ Adapted from www.wikipedia.com on 10 January 2025`
 
     try {
       recognition.start();
+      // Timeout adapté : 15 secondes pour les phrases courtes (largement suffisant)
       setTimeout(() => {
         if (recognition && isListening) {
           try { recognition.stop(); } catch(e) {}
         }
-      }, 8000);
+      }, 15000);
     } catch(e) {
       showFeedback("Appuyez à nouveau sur Parler", "warning");
       repeatBtn.textContent = '🎤 Parler';
@@ -587,11 +595,11 @@ Adapted from www.wikipedia.com on 10 January 2025`
     currentTextId = textId;
     const data = textsData[textId];
     if (!data) return;
-    sentences = splitIntoSentences(data.fullText, 100);
+    sentences = splitIntoSentences(data.fullText, 60); // 60 caractères max par phrase
     if (sentences.length === 0) {
-      sentences = [data.fullText.substring(0, 100) + '...'];
+      sentences = [data.fullText.substring(0, 60) + '...'];
     }
-    textHeader.innerHTML = `<h3>📖 ${data.title}</h3>`;
+    textHeader.innerHTML = `<h3>📖 ${data.title} (${sentences.length} phrases)</h3>`;
     loadProgress();
     resizeCanvas();
     homeScreen.style.display = 'none';
